@@ -3,6 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <title>Causal Learning Task</title>
+
   <style>
     body {
       font-family: Arial, sans-serif;
@@ -10,33 +11,94 @@
       margin-top: 40px;
     }
 
+    #triangle-container {
+      width: 420px;
+      margin: 40px auto;
+    }
+
     .node {
       width: 110px;
       height: 110px;
       border-radius: 50%;
       background-color: grey;
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      margin: 25px;
-      color: white;
-      font-size: 24px;
-      cursor: pointer;
       border: 3px solid black;
+      cursor: pointer;
+    }
+
+    #A {
+      margin: 0 auto;
+    }
+
+    #bottom-row {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 80px;
+    }
+
+    .choice {
+      display: block;
+      width: 420px;
+      margin: 12px auto;
+      padding: 12px;
+      font-size: 17px;
+      cursor: pointer;
+    }
+
+    #message, #answerMessage {
+      font-size: 18px;
+      margin-top: 20px;
+    }
+
+    #resetButton {
+      margin-top: 25px;
+      padding: 10px 20px;
+      font-size: 17px;
+      cursor: pointer;
     }
   </style>
 </head>
 
 <body>
+
   <h1>Causal Learning Task</h1>
-  <p>Click one grey node to intervene.</p>
+  <p>Click one grey light to test it.</p>
 
-  <div class="node" id="A" onclick="intervene('A')">A</div>
-  <div class="node" id="B" onclick="intervene('B')">B</div>
-  <div class="node" id="C" onclick="intervene('C')">C</div>
+  <div id="triangle-container">
+    <div class="node" id="A" onclick="intervene('A')"></div>
 
-  <p id="message">Choose a node.</p>
-  <button onclick="resetNodes()">Reset</button>
+    <div id="bottom-row">
+      <div class="node" id="B" onclick="intervene('B')"></div>
+      <div class="node" id="C" onclick="intervene('C')"></div>
+    </div>
+  </div>
+
+  <p id="message">Choose one light.</p>
+
+  <h2>What were you trying to test?</h2>
+
+  <button class="choice" onclick="chooseAnswer('prediction')">
+    I wanted to see what would happen after pressing this light.
+  </button>
+
+  <button class="choice" onclick="chooseAnswer('intervention')">
+    I wanted to test whether this light causes another light to turn on.
+  </button>
+
+  <button class="choice" onclick="chooseAnswer('counterfactual')">
+    I wanted to think about what would happen if I did not press this light.
+  </button>
+
+  <button class="choice" onclick="chooseAnswer('falsification')">
+    I wanted to check whether my current guess could be wrong.
+  </button>
+
+  <button class="choice" onclick="chooseAnswer('control')">
+    I wanted to compare different possible causal structures.
+  </button>
+
+  <p id="answerMessage"></p>
+
+  <button id="resetButton" onclick="resetNodes()">Reset</button>
 
   <script>
     const causalGraph = {
@@ -51,8 +113,13 @@
       C: "blue"
     };
 
+    let chosenNode = null;
+    let chosenReason = null;
+
     function intervene(node) {
       resetNodes();
+
+      chosenNode = node;
 
       document.getElementById(node).style.backgroundColor = colours[node];
 
@@ -61,7 +128,19 @@
       });
 
       document.getElementById("message").innerText =
-        "You clicked node " + node;
+        "You tested one light.";
+    }
+
+    function chooseAnswer(answer) {
+      chosenReason = answer;
+
+      document.getElementById("answerMessage").innerText =
+        "Answer recorded: " + answer;
+
+      console.log({
+        chosenNode: chosenNode,
+        chosenReason: chosenReason
+      });
     }
 
     function resetNodes() {
@@ -69,8 +148,10 @@
         document.getElementById(node).style.backgroundColor = "grey";
       });
 
-      document.getElementById("message").innerText = "Choose a node.";
+      document.getElementById("message").innerText = "Choose one light.";
+      document.getElementById("answerMessage").innerText = "";
     }
   </script>
+
 </body>
 </html>
