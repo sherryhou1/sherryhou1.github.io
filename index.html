@@ -1,10 +1,76 @@
 <!DOCTYPE html>
 <html>
 <head>
-	<title>sherryhou1.github.io</title>
+  <meta charset="UTF-8">
+  <title>Causal Learning Task</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      text-align: center;
+      margin-top: 40px;
+    }
+
+    .node {
+      width: 110px;
+      height: 110px;
+      border-radius: 50%;
+      background-color: grey;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      margin: 25px;
+      color: white;
+      font-size: 24px;
+      cursor: pointer;
+      border: 3px solid black;
+    }
+  </style>
 </head>
+
 <body>
-<h1>Hello World</h1>
-<p>.</p>
+  <h1>Causal Learning Task</h1>
+  <p>Click one grey node to intervene.</p>
+
+  <div class="node" id="A" onclick="intervene('A')">A</div>
+  <div class="node" id="B" onclick="intervene('B')">B</div>
+  <div class="node" id="C" onclick="intervene('C')">C</div>
+
+  <p id="message">Choose a node.</p>
+  <button onclick="resetNodes()">Reset</button>
+
+  <script>
+    const causalGraph = {
+      A: ["B", "C"],
+      B: [],
+      C: []
+    };
+
+    const colours = {
+      A: "red",
+      B: "gold",
+      C: "blue"
+    };
+
+    function intervene(node) {
+      resetNodes();
+
+      document.getElementById(node).style.backgroundColor = colours[node];
+
+      causalGraph[node].forEach(function(effect) {
+        document.getElementById(effect).style.backgroundColor = colours[effect];
+      });
+
+      document.getElementById("message").innerText =
+        "You clicked node " + node;
+    }
+
+    function resetNodes() {
+      ["A", "B", "C"].forEach(function(node) {
+        document.getElementById(node).style.backgroundColor = "grey";
+      });
+
+      document.getElementById("message").innerText = "Choose a node.";
+    }
+  </script>
 </body>
 </html>
