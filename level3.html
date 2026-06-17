@@ -144,7 +144,6 @@
   </div>
 
   <hr>
-<hr>
 
 <h2>What is the hidden rule?</h2>
 
@@ -186,8 +185,8 @@
 </div>
 
 <p id="ruleMessage"></p>
-
-<button id="submitTrialButton" onclick="submitTrial()">
+  
+<button id="submitTrialButton" onclick="submitTrial()" disabled>
   Submit answer
 </button>
 
@@ -241,9 +240,11 @@
     if (lightOn) {
       light.classList.add("light-on");
       document.getElementById("result").innerText = "Result: The light turned ON.";
+      document.getElementById("submitTrialButton").disabled = false;
     } else {
       light.classList.remove("light-on");
       document.getElementById("result").innerText = "Result: The light stayed OFF.";
+      document.getElementById("submitTrialButton").disabled = false;
     }
 
     const trialData = {
@@ -355,6 +356,7 @@
     document.getElementsByName("rule").forEach(radio => {
       radio.checked = false;
     });
+    document.getElementById("submitTrialButton").disabled = true;
   }
 </script>
 
