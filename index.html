@@ -206,29 +206,46 @@
 
     <button id="resetButton" onclick="resetNodes()">Reset switches</button>
 
-    <hr>
+<hr>
 
-    <h2>What kind of test did you just do?</h2>
-    <div id="strategy-choices">
-      <button class="choice" data-strategy="single" onclick="chooseStrategy('single', this)">
-        I turned on only one switch to see if it matters alone.
-      </button>
-      <button class="choice" data-strategy="positive" onclick="chooseStrategy('positive', this)">
-        I tried a combination I thought would turn the light on.
-      </button>
-      <button class="choice" data-strategy="falsification" onclick="chooseStrategy('falsification', this)">
-        I tried a combination I thought should fail, to check the boundary.
-      </button>
-      <button class="choice" data-strategy="contrastive" onclick="chooseStrategy('contrastive', this)">
-        I changed exactly one switch from my last test.
-      </button>
-      <button class="choice" data-strategy="combinatorial" onclick="chooseStrategy('combinatorial', this)">
-        I tested two or more switches together to check if they interact.
-      </button>
-    </div>
-    <p id="answerMessage"></p>
+<h2>Before seeing the result, what were you thinking when you chose this test?</h2>
 
-    <hr>
+<p>
+Please choose the option that best describes your reasoning.
+</p>
+
+<div id="strategy-choices">
+
+  <button class="choice" data-strategy="explore"
+          onclick="chooseStrategy('explore', this)">
+    I was exploring because I was not yet sure how the switches work.
+  </button>
+
+  <button class="choice" data-strategy="confirm"
+          onclick="chooseStrategy('confirm', this)">
+    I wanted to check whether my current idea was correct.
+  </button>
+
+  <button class="choice" data-strategy="compare"
+          onclick="chooseStrategy('compare', this)">
+    I wanted to compare this test with something I had tried before.
+  </button>
+
+  <button class="choice" data-strategy="interaction"
+          onclick="chooseStrategy('interaction', this)">
+    I wanted to see whether multiple switches work together.
+  </button>
+
+  <button class="choice" data-strategy="uncertain"
+          onclick="chooseStrategy('uncertain', this)">
+    I was unsure, but this seemed like a useful test to try.
+  </button>
+
+</div>
+
+<p id="answerMessage"></p>
+
+<hr>
 
     <h2>What is the hidden rule?</h2>
     <div id="rule-options">
