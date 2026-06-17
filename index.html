@@ -211,7 +211,7 @@
 <h2>Before seeing the result, what were you thinking when you chose this test?</h2>
 
 <p>
-Please choose the option that best describes your reasoning.
+Please choose the option that best describes your choice.
 </p>
 
 <div id="strategy-choices">
@@ -242,6 +242,7 @@ Please choose the option that best describes your reasoning.
   </button>
 
 </div>
+<p id="answerMessage"></p>
 
 <hr>
 
@@ -418,8 +419,6 @@ Please choose the option that best describes your reasoning.
         b.classList.remove("selected");
       });
       btn.classList.add("selected");
-      document.getElementById("answerMessage").innerText =
-        "Strategy recorded: " + strategy;
 
       document.getElementById("submitTrialButton").disabled =
         !(chosenStrategy !== null && testCount > 0 && ruleSelected());
