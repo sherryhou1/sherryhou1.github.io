@@ -65,46 +65,48 @@
       border: 3px solid black;
       background-color: #dcedc8;
     }
+
+    #history-box {
+      display: none;
+      text-align: left;
+      max-width: 420px;
+      margin: 16px auto;
+      padding: 10px 14px;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      background: #fafafa;
+      font-size: 13px;
+      max-height: 140px;
+      overflow-y: auto;
+    }
+
+    #history-box div {
+      padding: 2px 0;
+      border-bottom: 1px solid #eee;
+    }
+
     #rule-options {
-  max-width: 420px;
-  margin: 0 auto;
-  text-align: left;
-}
+      max-width: 420px;
+      margin: 0 auto;
+      text-align: left;
+    }
 
-#rule-options label {
-  display: block;
-  margin: 8px 0;
-  font-size: 16px;
-  cursor: pointer;
-}
+    #rule-options label {
+      display: block;
+      margin: 8px 0;
+      font-size: 16px;
+      cursor: pointer;
+    }
 
-#feedback-box {
-  max-width: 420px;
-  margin: 16px auto;
-  padding: 14px;
-  border-radius: 8px;
-  font-size: 15px;
-  display: none;
-  text-align: left;
-}
-
-#history-box {
-  text-align: left;
-  max-width: 420px;
-  margin: 16px auto;
-  padding: 10px 14px;
-  border: 1px solid #ccc;
-  border-radius: 8px;
-  background: #fafafa;
-  font-size: 13px;
-  max-height: 140px;
-  overflow-y: auto;
-}
-
-#history-box div {
-  padding: 2px 0;
-  border-bottom: 1px solid #eee;
-}
+    #feedback-box {
+      max-width: 420px;
+      margin: 16px auto;
+      padding: 14px;
+      border-radius: 8px;
+      font-size: 15px;
+      display: none;
+      text-align: left;
+    }
   </style>
 </head>
 
@@ -119,7 +121,7 @@
   </p>
 
   <p>
-    In this level, the rule may depend on how switches relate to each other.
+    Try to discover the hidden rule that determines when the light turns on.
   </p>
 
   <div>
@@ -134,9 +136,10 @@
   <button onclick="resetTrial()">Reset</button>
 
   <p id="result"></p>
+
   <div id="history-box">
-  <strong style="font-size:13px;">Test history</strong>
-  <div id="history-log"></div>
+    <strong style="font-size:13px;">Test history</strong>
+    <div id="history-log"></div>
   </div>
 
   <hr>
@@ -167,233 +170,219 @@
 
   <hr>
 
-<h2>What is the hidden rule?</h2>
+  <h2>What is the hidden rule?</h2>
 
-<div id="rule-options">
-  <label>
-    <input type="radio" name="rule" value="N1">
-    N1 alone controls the light
-  </label>
+  <div id="rule-options">
+    <label><input type="radio" name="rule" value="N1"> N1 alone controls the light</label>
+    <label><input type="radio" name="rule" value="N2"> N2 alone controls the light</label>
+    <label><input type="radio" name="rule" value="N4"> N4 alone controls the light</label>
+    <label><input type="radio" name="rule" value="N1_AND_N2"> N1 AND N2 must both be on</label>
+    <label><input type="radio" name="rule" value="N1_OR_N2"> N1 OR N2 being on is enough</label>
+    <label><input type="radio" name="rule" value="MATCH_N1_N2"> The light turns on when N1 and N2 match, both on or both off</label>
+    <label><input type="radio" name="rule" value="N1_AND_N2_AND_N4"> N1, N2, AND N4 must all be on</label>
+  </div>
 
-  <label>
-    <input type="radio" name="rule" value="N2">
-    N2 alone controls the light
-  </label>
+  <p id="ruleMessage"></p>
 
-  <label>
-    <input type="radio" name="rule" value="N4">
-    N4 alone controls the light
-  </label>
+  <button id="submitTrialButton" onclick="submitTrial()" disabled>
+    Submit answer
+  </button>
 
-  <label>
-    <input type="radio" name="rule" value="N1_AND_N2">
-    N1 AND N2 must both be on
-  </label>
+  <div id="feedback-box"></div>
 
-  <label>
-    <input type="radio" name="rule" value="N1_OR_N2">
-    N1 OR N2 being on is enough
-  </label>
-
-  <label>
-    <input type="radio" name="rule" value="MATCH_N1_N2">
-    The light turns on when N1 and N2 match, both on or both off
-  </label>
-
-  <label>
-    <input type="radio" name="rule" value="N1_AND_N2_AND_N4">
-    N1, N2, AND N4 must all be on
-  </label>
-</div>
-
-<p id="ruleMessage"></p>
-  
-<button id="submitTrialButton" onclick="submitTrial()" disabled>
-  Submit answer
-</button>
-
-<div id="feedback-box"></div>
-
-<script>
-  let switches = {
-    N1: false,
-    N2: false,
-    N4: false
-  };
-
-  let chosenStrategy = "";
-  let trialNumber = 1;
-  let data = [];
-
-  function toggleSwitch(node) {
-    switches[node] = !switches[node];
-
-    const element = document.getElementById(node);
-
-    if (switches[node]) {
-      element.classList.add("on");
-    } else {
-      element.classList.remove("on");
-    }
-  }
-
-  function evaluateRule() {
-    return switches.N1 === switches.N2;
-  }
-
-  function classifyTest() {
-    const numberOn = Object.values(switches).filter(Boolean).length;
-
-    if (numberOn === 1) {
-      return "single_change";
-    }
-
-    if (numberOn >= 2) {
-      return "multi_change";
-    }
-
-    return "none_on";
-  }
-
-  function testLight() {
-    const lightOn = evaluateRule();
-    const light = document.getElementById("light");
-
-    if (lightOn) {
-      light.classList.add("light-on");
-      document.getElementById("result").innerText = "Result: The light turned ON.";
-      document.getElementById("submitTrialButton").disabled = false;
-    } else {
-      light.classList.remove("light-on");
-      document.getElementById("result").innerText = "Result: The light stayed OFF.";
-      document.getElementById("submitTrialButton").disabled = false;
-    }
-
-    const trialData = {
-      trial: trialNumber,
-      level: 3,
-      rule: "MATCH_N1_N2",
-      N1: switches.N1,
-      N2: switches.N2,
-      N4: switches.N4,
-      test_type: classifyTest(),
-      reasoning: chosenStrategy,
-      light_on: lightOn
-    };
-
-    data.push(trialData);
-    console.log(data);
-
-    trialNumber++;
-  }
-
-  function logHistoryRow(entry) {
-    const log = document.getElementById("history-log");
-    const row = document.createElement("div");
-
-    row.innerText =
-      "Test " + entry.trial + ": N1=" + (entry.N1 ? "ON" : "OFF") +
-      ", N2=" + (entry.N2 ? "ON" : "OFF") +
-      ", N4=" + (entry.N4 ? "ON" : "OFF") +
-      " → light " + (entry.light_on ? "ON" : "OFF");
-
-    log.prepend(row);
-  }
-
-  function chooseStrategy(strategy, button) {
-    chosenStrategy = strategy;
-
-    document.querySelectorAll(".choice").forEach(btn => {
-      btn.classList.remove("selected");
-    });
-
-    button.classList.add("selected");
-  }
-
-  function getSelectedRule() {
-    const radios = document.getElementsByName("rule");
-
-    for (let i = 0; i < radios.length; i++) {
-      if (radios[i].checked) {
-        return radios[i].value;
-      }
-    }
-
-    return null;
-  }
-
-  function submitTrial() {
-    const selectedRule = getSelectedRule();
-    const correctRule = "MATCH_N1_N2";
-    const feedbackBox = document.getElementById("feedback-box");
-
-    if (selectedRule === null) {
-      alert("Please choose a hidden rule first.");
-      return;
-    }
-
-    const isCorrect = selectedRule === correctRule;
-
-    feedbackBox.style.display = "block";
-
-    if (isCorrect) {
-      feedbackBox.style.backgroundColor = "#e8f5e9";
-      feedbackBox.style.border = "1px solid #2e7d32";
-      feedbackBox.innerHTML =
-        "<strong>Correct.</strong> The light turns on when N1 and N2 match, both ON or both OFF.";
-    } else {
-      feedbackBox.style.backgroundColor = "#fdecea";
-      feedbackBox.style.border = "1px solid #c62828";
-      feedbackBox.innerHTML =
-        "<strong>Not quite.</strong> The actual rule was: the light turns on when N1 and N2 match, both ON or both OFF.";
-    }
-
-    data.push({
-      trial: trialNumber,
-      level: 3,
-      selectedRule: selectedRule,
-      correctRule: correctRule,
-      isCorrect: isCorrect,
-      finalSwitchState: {
-        N1: switches.N1,
-        N2: switches.N2,
-        N4: switches.N4
-      },
-      reasoning: chosenStrategy
-    });
-
-    console.log(data);
-  }
-
-  function resetTrial() {
-    switches = {
+  <script>
+    let switches = {
       N1: false,
       N2: false,
       N4: false
     };
 
-    ["N1", "N2", "N4"].forEach(node => {
-      document.getElementById(node).classList.remove("on");
-    });
+    let chosenStrategy = "";
+    let trialNumber = 1;
+    let data = [];
+    let hasTested = false;
 
-    document.getElementById("light").classList.remove("light-on");
-    document.getElementById("result").innerText = "";
+    function toggleSwitch(node) {
+      switches[node] = !switches[node];
 
-    chosenStrategy = "";
+      const element = document.getElementById(node);
 
-    document.querySelectorAll(".choice").forEach(btn => {
-      btn.classList.remove("selected");
-    });
+      if (switches[node]) {
+        element.classList.add("on");
+      } else {
+        element.classList.remove("on");
+      }
+    }
 
-    document.getElementById("feedback-box").style.display = "none";
-    document.getElementById("feedback-box").innerHTML = "";
+    function evaluateRule() {
+      return switches.N1 === switches.N2;
+    }
 
-    document.getElementsByName("rule").forEach(radio => {
-      radio.checked = false;
-    });
-    document.getElementById("submitTrialButton").disabled = true;
-  }
-</script>
+    function classifyTest() {
+      const numberOn = Object.values(switches).filter(Boolean).length;
+
+      if (numberOn === 1) {
+        return "single_change";
+      }
+
+      if (numberOn >= 2) {
+        return "multi_change";
+      }
+
+      return "none_on";
+    }
+
+    function testLight() {
+      const lightOn = evaluateRule();
+      const light = document.getElementById("light");
+
+      if (lightOn) {
+        light.classList.add("light-on");
+        document.getElementById("result").innerText = "Result: The light turned ON.";
+      } else {
+        light.classList.remove("light-on");
+        document.getElementById("result").innerText = "Result: The light stayed OFF.";
+      }
+
+      hasTested = true;
+      document.getElementById("submitTrialButton").disabled = false;
+
+      const trialData = {
+        trial: trialNumber,
+        level: 3,
+        rule: "MATCH_N1_N2",
+        N1: switches.N1,
+        N2: switches.N2,
+        N4: switches.N4,
+        test_type: classifyTest(),
+        reasoning: chosenStrategy,
+        light_on: lightOn
+      };
+
+      data.push(trialData);
+      logHistoryRow(trialData);
+      console.log(data);
+
+      trialNumber++;
+    }
+
+    function logHistoryRow(entry) {
+      document.getElementById("history-box").style.display = "block";
+
+      const log = document.getElementById("history-log");
+      const row = document.createElement("div");
+
+      row.innerText =
+        "Test " + entry.trial +
+        ": N1=" + (entry.N1 ? "ON" : "OFF") +
+        ", N2=" + (entry.N2 ? "ON" : "OFF") +
+        ", N4=" + (entry.N4 ? "ON" : "OFF") +
+        " → Light " + (entry.light_on ? "ON" : "OFF");
+
+      log.prepend(row);
+    }
+
+    function chooseStrategy(strategy, button) {
+      chosenStrategy = strategy;
+
+      document.querySelectorAll(".choice").forEach(btn => {
+        btn.classList.remove("selected");
+      });
+
+      button.classList.add("selected");
+    }
+
+    function getSelectedRule() {
+      const radios = document.getElementsByName("rule");
+
+      for (let i = 0; i < radios.length; i++) {
+        if (radios[i].checked) {
+          return radios[i].value;
+        }
+      }
+
+      return null;
+    }
+
+    function submitTrial() {
+      if (!hasTested) {
+        alert("Please test the switches first.");
+        return;
+      }
+
+      const selectedRule = getSelectedRule();
+      const correctRule = "MATCH_N1_N2";
+      const feedbackBox = document.getElementById("feedback-box");
+
+      if (selectedRule === null) {
+        alert("Please choose a hidden rule first.");
+        return;
+      }
+
+      const isCorrect = selectedRule === correctRule;
+
+      feedbackBox.style.display = "block";
+
+      if (isCorrect) {
+        feedbackBox.style.backgroundColor = "#e8f5e9";
+        feedbackBox.style.border = "1px solid #2e7d32";
+        feedbackBox.innerHTML =
+          "<strong>Correct.</strong> You identified the hidden rule.";
+      } else {
+        feedbackBox.style.backgroundColor = "#fdecea";
+        feedbackBox.style.border = "1px solid #c62828";
+        feedbackBox.innerHTML =
+          "<strong>Not correct.</strong> Continue testing and try again.";
+      }
+
+      data.push({
+        trial: trialNumber,
+        level: 3,
+        selectedRule: selectedRule,
+        correctRule: correctRule,
+        isCorrect: isCorrect,
+        finalSwitchState: {
+          N1: switches.N1,
+          N2: switches.N2,
+          N4: switches.N4
+        },
+        reasoning: chosenStrategy
+      });
+
+      console.log(data);
+    }
+
+    function resetTrial() {
+      switches = {
+        N1: false,
+        N2: false,
+        N4: false
+      };
+
+      hasTested = false;
+
+      ["N1", "N2", "N4"].forEach(node => {
+        document.getElementById(node).classList.remove("on");
+      });
+
+      document.getElementById("light").classList.remove("light-on");
+      document.getElementById("result").innerText = "";
+
+      chosenStrategy = "";
+
+      document.querySelectorAll(".choice").forEach(btn => {
+        btn.classList.remove("selected");
+      });
+
+      document.getElementById("feedback-box").style.display = "none";
+      document.getElementById("feedback-box").innerHTML = "";
+      document.getElementById("submitTrialButton").disabled = true;
+
+      document.getElementsByName("rule").forEach(radio => {
+        radio.checked = false;
+      });
+    }
+  </script>
 
 </body>
 </html>
