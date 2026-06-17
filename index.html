@@ -2,161 +2,565 @@
 <html>
 <head>
   <meta charset="UTF-8">
-  <title>Causal Learning Task</title>
-
+  <title>Task</title>
   <style>
     body {
       font-family: Arial, sans-serif;
       text-align: center;
-      margin-top: 40px;
+      margin-top: 30px;
     }
-
+    #task-wrapper {
+      max-width: 480px;
+      margin: 0 auto;
+    }
+    #level-banner {
+      display: inline-block;
+      padding: 6px 16px;
+      border-radius: 16px;
+      font-size: 14px;
+      font-weight: bold;
+      margin-bottom: 10px;
+    }
+    #trial-counter {
+      font-size: 14px;
+      color: #555;
+      margin-bottom: 20px;
+    }
     #triangle-container {
-      width: 420px;
-      margin: 40px auto;
+      width: 460px;
+      margin: 20px auto;
     }
-
     .node {
-      width: 110px;
-      height: 110px;
+      width: 90px;
+      height: 90px;
       border-radius: 50%;
       background-color: grey;
       border: 3px solid black;
       cursor: pointer;
-    }
-
-    #A {
       margin: 0 auto;
     }
-
+    .node.disabled {
+      cursor: not-allowed;
+      opacity: 0.5;
+    }
+    .node.outcome-node {
+      cursor: default;
+    }
+    #top-row {
+      display: flex;
+      justify-content: center;
+      gap: 60px;
+    }
     #bottom-row {
       display: flex;
-      justify-content: space-between;
-      margin-top: 80px;
+      justify-content: center;
+      margin-top: 60px;
     }
-
-    .choice {
-      display: block;
-      width: 420px;
-      margin: 12px auto;
-      padding: 12px;
-      font-size: 17px;
-      cursor: pointer;
+    .node-label {
+      font-size: 14px;
+      margin-top: 8px;
+      color: #444;
     }
-
-    #message, #answerMessage {
+    .node-state {
+      font-size: 12px;
+      margin-top: 2px;
+      color: #777;
+      font-weight: bold;
+    }
+    #message, #ruleMessage, #answerMessage {
       font-size: 18px;
       margin-top: 20px;
     }
-
-    #resetButton {
-      margin-top: 25px;
-      padding: 10px 20px;
-      font-size: 17px;
+    #history-box {
+      text-align: left;
+      max-width: 420px;
+      margin: 16px auto;
+      padding: 10px 14px;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      background: #fafafa;
+      font-size: 13px;
+      max-height: 140px;
+      overflow-y: auto;
+    }
+    #history-box div {
+      padding: 2px 0;
+      border-bottom: 1px solid #eee;
+    }
+    .choice {
+      display: block;
+      width: 420px;
+      margin: 10px auto;
+      padding: 12px;
+      font-size: 16px;
       cursor: pointer;
+      text-align: left;
+    }
+    .choice.selected {
+      border: 2px solid #333;
+      background-color: #e8e8e8;
+      font-weight: bold;
+    }
+    #rule-options {
+      max-width: 420px;
+      margin: 0 auto;
+      text-align: left;
+    }
+    #rule-options label {
+      display: block;
+      margin: 8px 0;
+      font-size: 16px;
+      cursor: pointer;
+    }
+    button {
+      cursor: pointer;
+    }
+    #resetButton, #submitTrialButton, #nextTrialButton {
+      margin-top: 20px;
+      padding: 10px 20px;
+      font-size: 16px;
+    }
+    #submitTrialButton {
+      background-color: #2e7d32;
+      color: white;
+      border: none;
+      border-radius: 6px;
+    }
+    #submitTrialButton:disabled {
+      background-color: #aaa;
+      cursor: not-allowed;
+    }
+    #nextTrialButton {
+      background-color: #1565c0;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      display: none;
+    }
+    #feedback-box {
+      max-width: 420px;
+      margin: 16px auto;
+      padding: 14px;
+      border-radius: 8px;
+      font-size: 15px;
+      display: none;
+      text-align: left;
+    }
+    #feedback-box.correct {
+      background-color: #e8f5e9;
+      border: 1px solid #2e7d32;
+    }
+    #feedback-box.incorrect {
+      background-color: #fdecea;
+      border: 1px solid #c62828;
+    }
+    hr {
+      max-width: 420px;
+      margin: 30px auto;
     }
   </style>
 </head>
-
 <body>
 
- <h2>Example Graph</h2>
+  <div id="task-wrapper">
 
-<img src="graph1.png"
-     width="400"
-     alt="Example causal graph">
-  
-  <h1>Causal Learning Task</h1>
-  <p>Click one grey light to test it.</p>
+    <div id="level-banner">Level 1 — Simple</div>
+    <div id="trial-counter">Trial 1 of 8</div>
 
-  <div id="triangle-container">
-    <div class="node" id="A" onclick="intervene('A')"></div>
+    <h1>Concept Learning Task</h1>
+    <p>Click a light to test it. Find the hidden rule that turns the outcome light on.</p>
 
-    <div id="bottom-row">
-      <div class="node" id="B" onclick="intervene('B')"></div>
-      <div class="node" id="C" onclick="intervene('C')"></div>
+    <div id="triangle-container">
+      <div id="top-row">
+        <div>
+          <div class="node" id="A" onclick="intervene('A')"></div>
+          <div class="node-label">N1 (you control)</div>
+          <div class="node-state" id="A-state">OFF</div>
+        </div>
+        <div>
+          <div class="node" id="B" onclick="intervene('B')"></div>
+          <div class="node-label">N2 (you control)</div>
+          <div class="node-state" id="B-state">OFF</div>
+        </div>
+        <div>
+          <div class="node" id="D" onclick="intervene('D')"></div>
+          <div class="node-label">N4 (you control)</div>
+          <div class="node-state" id="D-state">OFF</div>
+        </div>
+      </div>
+      <div id="bottom-row">
+        <div>
+          <div class="node outcome-node" id="C"></div>
+          <div class="node-label">N3 (outcome)</div>
+          <div class="node-state" id="C-state">OFF</div>
+        </div>
+      </div>
     </div>
+
+    <p id="message">Choose a light to test.</p>
+
+    <div id="history-box">
+      <strong style="font-size:13px;">Test history</strong>
+      <div id="history-log"></div>
+    </div>
+
+    <button id="resetButton" onclick="resetNodes()">Reset switches</button>
+
+    <hr>
+
+    <h2>What kind of test did you just do?</h2>
+    <div id="strategy-choices">
+      <button class="choice" data-strategy="single" onclick="chooseStrategy('single', this)">
+        I turned on only one switch to see if it matters alone.
+      </button>
+      <button class="choice" data-strategy="positive" onclick="chooseStrategy('positive', this)">
+        I tried a combination I thought would turn the light on.
+      </button>
+      <button class="choice" data-strategy="falsification" onclick="chooseStrategy('falsification', this)">
+        I tried a combination I thought should fail, to check the boundary.
+      </button>
+      <button class="choice" data-strategy="contrastive" onclick="chooseStrategy('contrastive', this)">
+        I changed exactly one switch from my last test.
+      </button>
+      <button class="choice" data-strategy="combinatorial" onclick="chooseStrategy('combinatorial', this)">
+        I tested two or more switches together to check if they interact.
+      </button>
+    </div>
+    <p id="answerMessage"></p>
+
+    <hr>
+
+    <h2>What is the hidden rule?</h2>
+    <div id="rule-options">
+      <label><input type="radio" name="rule" value="N1"> N1 alone controls the light</label>
+      <label><input type="radio" name="rule" value="N2"> N2 alone controls the light</label>
+      <label><input type="radio" name="rule" value="N4"> N4 alone controls the light</label>
+      <label><input type="radio" name="rule" value="N1_AND_N2"> N1 AND N2 must both be on</label>
+      <label><input type="radio" name="rule" value="N1_OR_N2"> N1 OR N2 being on is enough</label>
+      <label><input type="radio" name="rule" value="MATCH_N1_N2"> The light turns on when N1 and N2 match (both on or both off)</label>
+      <label><input type="radio" name="rule" value="N1_AND_N2_AND_N4"> N1, N2, AND N4 must all be on</label>
+    </div>
+
+    <p id="ruleMessage"></p>
+
+    <button id="submitTrialButton" onclick="submitTrial()" disabled>Submit trial</button>
+
+    <div id="feedback-box"></div>
+
+    <button id="nextTrialButton" onclick="nextTrial()">Next trial &rarr;</button>
+
   </div>
 
-  <p id="message">Choose one light.</p>
-
-  <h2>What were you trying to test?</h2>
-
-  <button class="choice" onclick="chooseAnswer('prediction')">
-    I wanted to see what would happen after pressing this light.
-  </button>
-
-  <button class="choice" onclick="chooseAnswer('intervention')">
-    I wanted to test whether this light causes another light to turn on.
-  </button>
-
-  <button class="choice" onclick="chooseAnswer('counterfactual')">
-    I wanted to think about what would happen if I did not press this light.
-  </button>
-
-  <button class="choice" onclick="chooseAnswer('falsification')">
-    I wanted to check whether my current guess could be wrong.
-  </button>
-
-  <button class="choice" onclick="chooseAnswer('control')">
-    I wanted to compare different possible causal structures.
-  </button>
-
-  <p id="answerMessage"></p>
-
-  <button id="resetButton" onclick="resetNodes()">Reset</button>
-
   <script>
-    const causalGraph = {
-      A: ["B", "C"],
-      B: [],
-      C: []
-    };
+    /* ---------- Trial / level configuration ---------- */
 
-    const colours = {
-      A: "red",
-      B: "gold",
-      C: "blue"
-    };
+    const TRIALS_PER_LEVEL = 8;
 
-    let chosenNode = null;
-    let chosenReason = null;
+    const LEVELS = [
+      {
+        name: "Level 1 — Simple",
+        color: "#2e7d32",
+        bg: "#e8f5e9",
+        rule: "N1",
+        description: "N1 = ON controls the light. N2 and N4 are irrelevant."
+      },
+      {
+        name: "Level 2 — Conjunctive",
+        color: "#1565c0",
+        bg: "#e3f2fd",
+        rule: "N1_AND_N2",
+        description: "N1 AND N2 must both be ON for the light to turn on. N4 is irrelevant."
+      },
+      {
+        name: "Level 3 — Relational",
+        color: "#e65100",
+        bg: "#fff3e0",
+        rule: "MATCH_N1_N2",
+        description: "The light turns on when N1 and N2 match (both ON or both OFF). N4 is irrelevant."
+      },
+      {
+        name: "Level 4 — Three-way conjunctive",
+        color: "#6a1b9a",
+        bg: "#f3e5f5",
+        rule: "N1_AND_N2_AND_N4",
+        description: "N1, N2, AND N4 must all be ON for the light to turn on."
+      }
+    ];
 
-    function intervene(node) {
-      resetNodes();
+    let levelIndex = 0;
+    let trialIndex = 1; // 1-indexed within a level
 
-      chosenNode = node;
+    /* ---------- Node / outcome state ---------- */
 
-      document.getElementById(node).style.backgroundColor = colours[node];
+    let stateA = false; // N1
+    let stateB = false; // N2
+    let stateD = false; // N4
+    let outcomeOn = false;
 
-      causalGraph[node].forEach(function(effect) {
-        document.getElementById(effect).style.backgroundColor = colours[effect];
-      });
+    let testHistory = []; // history within the current trial
+    let chosenStrategy = null;
+    let testCount = 0;
 
-      document.getElementById("message").innerText =
-        "You tested one light.";
+    /* ---------- Data log across the whole session ---------- */
+
+    let sessionLog = [];
+
+    /* ---------- Outcome rule logic ---------- */
+
+    function evaluateOutcome(rule, n1, n2, n4) {
+      switch (rule) {
+        case "N1":
+          return n1;
+        case "N2":
+          return n2;
+        case "N4":
+          return n4;
+        case "N1_AND_N2":
+          return n1 && n2;
+        case "N1_OR_N2":
+          return n1 || n2;
+        case "MATCH_N1_N2":
+          return n1 === n2;
+        case "N1_AND_N2_AND_N4":
+          return n1 && n2 && n4;
+        default:
+          return false;
+      }
     }
 
-    function chooseAnswer(answer) {
-      chosenReason = answer;
+    /* ---------- Intervention ---------- */
 
-      document.getElementById("answerMessage").innerText =
-        "Answer recorded: " + answer;
+    function intervene(node) {
+      if (node === "A") {
+        stateA = !stateA;
+      } else if (node === "B") {
+        stateB = !stateB;
+      } else if (node === "D") {
+        stateD = !stateD;
+      }
 
-      console.log({
-        chosenNode: chosenNode,
-        chosenReason: chosenReason
-      });
+      const currentRule = LEVELS[levelIndex].rule;
+      outcomeOn = evaluateOutcome(currentRule, stateA, stateB, stateD);
+
+      updateNodeDisplay();
+
+      testCount++;
+      const entry = {
+        testNumber: testCount,
+        n1: stateA,
+        n2: stateB,
+        n4: stateD,
+        outcome: outcomeOn
+      };
+      testHistory.push(entry);
+      logHistoryRow(entry);
+
+      document.getElementById("message").innerText = outcomeOn
+        ? "The light turned ON."
+        : "The light is OFF.";
+
+      document.getElementById("submitTrialButton").disabled =
+        !(chosenStrategy !== null && testCount > 0 && ruleSelected());
+    }
+
+    function updateNodeDisplay() {
+      document.getElementById("A").style.backgroundColor = stateA ? "#EF9F27" : "grey";
+      document.getElementById("B").style.backgroundColor = stateB ? "#EF9F27" : "grey";
+      document.getElementById("D").style.backgroundColor = stateD ? "#EF9F27" : "grey";
+      document.getElementById("C").style.backgroundColor = outcomeOn ? "#43a047" : "grey";
+
+      document.getElementById("A-state").innerText = stateA ? "ON" : "OFF";
+      document.getElementById("B-state").innerText = stateB ? "ON" : "OFF";
+      document.getElementById("D-state").innerText = stateD ? "ON" : "OFF";
+      document.getElementById("C-state").innerText = outcomeOn ? "ON" : "OFF";
+    }
+
+    function logHistoryRow(entry) {
+      const log = document.getElementById("history-log");
+      const row = document.createElement("div");
+      row.innerText =
+        "Test " + entry.testNumber + ":  N1=" + (entry.n1 ? "ON" : "OFF") +
+        ", N2=" + (entry.n2 ? "ON" : "OFF") +
+        ", N4=" + (entry.n4 ? "ON" : "OFF") +
+        "  ->  light " + (entry.outcome ? "ON" : "OFF");
+      log.prepend(row);
     }
 
     function resetNodes() {
-      ["A", "B", "C"].forEach(function(node) {
-        document.getElementById(node).style.backgroundColor = "grey";
+      stateA = false;
+      stateB = false;
+      stateD = false;
+      outcomeOn = false;
+      updateNodeDisplay();
+      document.getElementById("message").innerText = "Choose a light to test.";
+    }
+
+    /* ---------- Strategy choice ---------- */
+
+    function chooseStrategy(strategy, btn) {
+      chosenStrategy = strategy;
+      document.querySelectorAll("#strategy-choices .choice").forEach(function (b) {
+        b.classList.remove("selected");
+      });
+      btn.classList.add("selected");
+      document.getElementById("answerMessage").innerText =
+        "Strategy recorded: " + strategy;
+
+      document.getElementById("submitTrialButton").disabled =
+        !(chosenStrategy !== null && testCount > 0 && ruleSelected());
+    }
+
+    function ruleSelected() {
+      const radios = document.getElementsByName("rule");
+      for (let i = 0; i < radios.length; i++) {
+        if (radios[i].checked) return true;
+      }
+      return false;
+    }
+
+    function getSelectedRule() {
+      const radios = document.getElementsByName("rule");
+      for (let i = 0; i < radios.length; i++) {
+        if (radios[i].checked) return radios[i].value;
+      }
+      return null;
+    }
+
+    document.getElementsByName("rule").forEach(function (radio) {
+      radio.addEventListener("change", function () {
+        document.getElementById("submitTrialButton").disabled =
+          !(chosenStrategy !== null && testCount > 0 && ruleSelected());
+      });
+    });
+
+    /* ---------- Trial submission and feedback ---------- */
+
+    function submitTrial() {
+      const selectedRule = getSelectedRule();
+      const correctRule = LEVELS[levelIndex].rule;
+      const isCorrect = selectedRule === correctRule;
+
+      const trialRecord = {
+        level: LEVELS[levelIndex].name,
+        trialNumber: trialIndex,
+        testHistory: testHistory.slice(),
+        numberOfTests: testCount,
+        chosenStrategy: chosenStrategy,
+        selectedRule: selectedRule,
+        correctRule: correctRule,
+        isCorrect: isCorrect
+      };
+      sessionLog.push(trialRecord);
+      console.log(trialRecord);
+
+      const feedbackBox = document.getElementById("feedback-box");
+      feedbackBox.style.display = "block";
+      feedbackBox.className = isCorrect ? "correct" : "incorrect";
+      feedbackBox.innerHTML = isCorrect
+        ? "<strong>Correct.</strong> " + LEVELS[levelIndex].description
+        : "<strong>Not quite.</strong> The actual rule was: " + LEVELS[levelIndex].description;
+
+      document.getElementById("submitTrialButton").style.display = "none";
+      document.getElementById("nextTrialButton").style.display = "inline-block";
+
+      document.querySelectorAll("#strategy-choices .choice").forEach(function (b) {
+        b.disabled = true;
+      });
+      document.getElementsByName("rule").forEach(function (r) {
+        r.disabled = true;
+      });
+      document.getElementById("A").classList.add("disabled");
+      document.getElementById("B").classList.add("disabled");
+      document.getElementById("D").classList.add("disabled");
+      document.getElementById("A").onclick = null;
+      document.getElementById("B").onclick = null;
+      document.getElementById("D").onclick = null;
+    }
+
+    function nextTrial() {
+      if (trialIndex >= TRIALS_PER_LEVEL) {
+        if (levelIndex < LEVELS.length - 1) {
+          levelIndex++;
+          trialIndex = 1;
+        } else {
+          showSessionComplete();
+          return;
+        }
+      } else {
+        trialIndex++;
+      }
+      startTrial();
+    }
+
+    function startTrial() {
+      // reset per-trial state
+      stateA = false;
+      stateB = false;
+      stateD = false;
+      outcomeOn = false;
+      testHistory = [];
+      chosenStrategy = null;
+      testCount = 0;
+
+      updateNodeDisplay();
+      document.getElementById("history-log").innerHTML = "";
+      document.getElementById("message").innerText = "Choose a light to test.";
+      document.getElementById("answerMessage").innerText = "";
+      document.getElementById("ruleMessage").innerText = "";
+
+      document.querySelectorAll("#strategy-choices .choice").forEach(function (b) {
+        b.classList.remove("selected");
+        b.disabled = false;
+      });
+      document.getElementsByName("rule").forEach(function (r) {
+        r.checked = false;
+        r.disabled = false;
       });
 
-      document.getElementById("message").innerText = "Choose one light.";
-      document.getElementById("answerMessage").innerText = "";
+      document.getElementById("A").classList.remove("disabled");
+      document.getElementById("B").classList.remove("disabled");
+      document.getElementById("D").classList.remove("disabled");
+      document.getElementById("A").onclick = function () { intervene("A"); };
+      document.getElementById("B").onclick = function () { intervene("B"); };
+      document.getElementById("D").onclick = function () { intervene("D"); };
+
+      document.getElementById("submitTrialButton").disabled = true;
+      document.getElementById("submitTrialButton").style.display = "inline-block";
+      document.getElementById("nextTrialButton").style.display = "none";
+
+      const feedbackBox = document.getElementById("feedback-box");
+      feedbackBox.style.display = "none";
+      feedbackBox.className = "";
+      feedbackBox.innerHTML = "";
+
+      updateBanner();
     }
+
+    function updateBanner() {
+      const level = LEVELS[levelIndex];
+      const banner = document.getElementById("level-banner");
+      banner.innerText = level.name;
+      banner.style.backgroundColor = level.bg;
+      banner.style.color = level.color;
+      banner.style.border = "1px solid " + level.color;
+
+      document.getElementById("trial-counter").innerText =
+        "Trial " + trialIndex + " of " + TRIALS_PER_LEVEL +
+        "  (Level " + (levelIndex + 1) + " of " + LEVELS.length + ")";
+    }
+
+    function showSessionComplete() {
+      document.getElementById("task-wrapper").innerHTML =
+        "<h1>Session complete</h1>" +
+        "<p>Thank you for completing all trials.</p>" +
+        "<p style='font-size:14px;color:#555;'>" + sessionLog.length + " trials recorded. See console for full data log.</p>";
+      console.log("FULL SESSION LOG:", sessionLog);
+    }
+
+    /* ---------- Initialise ---------- */
+
+    updateBanner();
+    updateNodeDisplay();
   </script>
 
 </body>
