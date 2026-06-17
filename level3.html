@@ -269,6 +269,19 @@
     trialNumber++;
   }
 
+  function logHistoryRow(entry) {
+    const log = document.getElementById("history-log");
+    const row = document.createElement("div");
+
+    row.innerText =
+      "Test " + entry.trial + ": N1=" + (entry.N1 ? "ON" : "OFF") +
+      ", N2=" + (entry.N2 ? "ON" : "OFF") +
+      ", N4=" + (entry.N4 ? "ON" : "OFF") +
+      " → light " + (entry.light_on ? "ON" : "OFF");
+
+    log.prepend(row);
+  }
+
   function chooseStrategy(strategy, button) {
     chosenStrategy = strategy;
 
