@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Concept Learning Task</title>
+
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      text-align: center;
+      margin: 40px;
+    }
+
+    .switch {
+      width: 90px;
+      height: 90px;
+      border-radius: 50%;
+      background-color: grey;
+      border: 3px solid black;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      margin: 20px;
+      cursor: pointer;
+      color: white;
+      font-weight: bold;
+    }
+
+    .on {
+      background-color: orange;
+    }
+
+    #light {
+      width: 120px;
+      height: 120px;
+      border-radius: 50%;
+      background-color: #555;
+      margin: 30px auto;
+      border: 4px solid black;
+      line-height: 120px;
+      color: white;
+      font-weight: bold;
+    }
+
+    .light-on {
+      background-color: gold !important;
+      color: black !important;
+      box-shadow: 0 0 25px gold;
+    }
+
+    button {
+      padding: 12px 20px;
+      margin: 10px;
+      font-size: 16px;
+      cursor: pointer;
+    }
+
+    .choice {
+      display: block;
+      width: 500px;
+      margin: 10px auto;
+    }
+
+    .selected {
+      border: 3px solid black;
+      background-color: #dcedc8;
+    }
+  </style>
+</head>
+
+<body>
+
+  <h1>Concept Learning Task</h1>
+
+  <h2 id="level-title">Level 2 — Two switches work together</h2>
+
+  <p>
+    Turn switches ON or OFF, then test whether the light turns on.
+  </p>
+
+  <div>
+    <div class="switch" id="N1" onclick="toggleSwitch('N1')">N1</div>
+    <div class="switch" id="N2" onclick="toggleSwitch('N2')">N2</div>
+    <div class="switch" id="N4" onclick="toggleSwitch('N4')">N4</div>
+  </div>
+
+  <div id="light">LIGHT</div>
+
+  <button onclick="testLight()">Test</button>
+  <button onclick="nextLevel()">Next Level</button>
+  <button onclick="resetTrial()">Reset</button>
+
+  <p id="result"></p>
+
+  <hr>
+
+  <h2>Before seeing the result, what were you thinking when you chose this test?</h2>
+
+  <div id="strategy-choices">
+    <button class="choice" onclick="chooseStrategy('explore', this)">
+      I was exploring because I was not yet sure how the switches work.
+    </button>
+
+    <button class="choice" onclick="chooseStrategy('confirm', this)">
+      I wanted to check whether my current idea was correct.
+    </button>
+
+    <button class="choice" onclick="chooseStrategy('compare', this)">
+      I wanted to compare this test with something I had tried before.
+    </button>
+
+    <button class="choice" onclick="chooseStrategy('interaction', this)">
+      I wanted to see whether multiple switches work together.
+    </button>
+
+    <button class="choice" onclick="chooseStrategy('uncertain', this)">
+      I was unsure, but this seemed like a useful test to try.
+    </button>
+  </div>
+
+  <hr>
+
+  <h2>Trial log</h2>
+  <pre id="log"></pre>
+
+  <script>
+    let currentLevel = 2;
+
+    let switches = {
+      N1: false,
+      N2: false,
+      N4: false
+    };
+
+    let chosenStrategy = "";
+    let trialNumber = 1;
+    let data = [];
+
+    function toggleSwitch(node) {
+      switches[node] = !switches[node];
+
+      const element = document.getElementById(node);
+
+      if (switches[node]) {
+        element.classList.add("on");
+      } else {
+        element.classList.remove("on");
+      }
+    }
+
+    function evaluateRule() {
+      if (currentLevel === 2) {
+        // Level 2 rule: N1 AND N2
+        return switches.N1 && switches.N2;
+      }
+
+      if (currentLevel === 4) {
+        // Level 4 rule: N1 AND N2 AND N4
+        return switches.N1 && switches.N2 && switches.N4;
+      }
+    }
+
+    function classifyTest() {
+      const numberOn = Object.values(switches).filter(Boolean).length;
+
+      if (numberOn === 1) {
+        return "single_change";
+      }
+
+      if (numberOn >= 2) {
+        return "multi_change";
+      }
+
+      return "none_on";
+    }
+
+    function testLight() {
+      const lightOn = evaluateRule();
+      const light = document.getElementById("light");
+
+      if (lightOn) {
+        light.classList.add("light-on");
+        document.getElementById("result").innerText = "Result: The light turned ON.";
+      } else {
+        light.classList.remove("light-on");
+        document.getElementById("result").innerText = "Result: The light stayed OFF.";
+      }
+
+      const trialData = {
+        trial: trialNumber,
+        level: currentLevel,
+        N1: switches.N1,
+        N2: switches.N2,
+        N4: switches.N4,
+        test_type: classifyTest(),
+        reasoning: chosenStrategy,
+        light_on: lightOn
+      };
+
+      data.push(trialData);
+      updateLog();
+
+      trialNumber++;
+    }
+
+    function chooseStrategy(strategy, button) {
+      chosenStrategy = strategy;
+
+      document.querySelectorAll(".choice").forEach(btn => {
+        btn.classList.remove("selected");
+      });
+
+      button.classList.add("selected");
+    }
+
+    function resetTrial() {
+      switches = {
+        N1: false,
+        N2: false,
+        N4: false
+      };
+
+      ["N1", "N2", "N4"].forEach(node => {
+        document.getElementById(node).classList.remove("on");
+      });
+
+      document.getElementById("light").classList.remove("light-on");
+      document.getElementById("result").innerText = "";
+
+      chosenStrategy = "";
+
+      document.querySelectorAll(".choice").forEach(btn => {
+        btn.classList.remove("selected");
+      });
+    }
+
+    function nextLevel() {
+      if (currentLevel === 2) {
+        currentLevel = 4;
+        document.getElementById("level-title").innerText =
+          "Level 4 — Three switches work together";
+      } else {
+        currentLevel = 2;
+        document.getElementById("level-title").innerText =
+          "Level 2 — Two switches work together";
+      }
+
+      resetTrial();
+    }
+
+    function updateLog() {
+      document.getElementById("log").innerText =
+        JSON.stringify(data, null, 2);
+    }
+  </script>
+
+</body>
+</html>
