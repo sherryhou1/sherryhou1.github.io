@@ -174,30 +174,30 @@
       <div id="top-row">
         <div>
           <div class="node" id="A" onclick="intervene('A')"></div>
-          <div class="node-label">N1 (you control)</div>
+          <div class="node-label">N1 (ON/OFF)</div>
           <div class="node-state" id="A-state">OFF</div>
         </div>
         <div>
           <div class="node" id="B" onclick="intervene('B')"></div>
-          <div class="node-label">N2 (you control)</div>
+          <div class="node-label">N2 (ON/OFF)</div>
           <div class="node-state" id="B-state">OFF</div>
         </div>
         <div>
           <div class="node" id="D" onclick="intervene('D')"></div>
-          <div class="node-label">N4 (you control)</div>
+          <div class="node-label">N3 (ON/OFF)</div>
           <div class="node-state" id="D-state">OFF</div>
         </div>
       </div>
       <div id="bottom-row">
         <div>
           <div class="node outcome-node" id="C"></div>
-          <div class="node-label">N3 (outcome)</div>
+          <div class="node-label">Outcome</div>
           <div class="node-state" id="C-state">OFF</div>
         </div>
       </div>
     </div>
 
-    <p id="message">Choose a light to test.</p>
+    <p id="message">Choose a node to test.</p>
 
     <div id="history-box">
       <strong style="font-size:13px;">Test history</strong>
@@ -208,7 +208,7 @@
 
 <hr>
 
-<h2>Before seeing the result, what were you thinking when you chose this test?</h2>
+<h2>Before the test, what were you thinking when you chose this test?</h2>
 
 <p>
 Please choose the option that best describes your choice.
@@ -228,17 +228,20 @@ Please choose the option that best describes your choice.
 
   <button class="choice" data-strategy="compare"
           onclick="chooseStrategy('compare', this)">
-    I wanted to compare this test with something I had tried before.
+    I changed exactly one switch from my last test to see
+   what difference it makes.
   </button>
 
   <button class="choice" data-strategy="interaction"
           onclick="chooseStrategy('interaction', this)">
-    I wanted to see whether multiple switches work together.
+    I changed exactly one switch from my last test to see
+   what difference it makes.
   </button>
 
   <button class="choice" data-strategy="uncertain"
           onclick="chooseStrategy('uncertain', this)">
-    I was unsure, but this seemed like a useful test to try.
+    I thought the rule might require more than one switch,
+   so I tested a combination.
   </button>
 
 </div>
