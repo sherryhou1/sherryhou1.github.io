@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Thank You</title>
+<style>
+  body { font-family: Arial, sans-serif; margin: 0; padding: 40px 20px; background: #f7f7f8; color: #222; }
+  .page-wrapper { max-width: 680px; margin: 0 auto; background: #fff; border: 1px solid #ddd; border-radius: 10px; padding: 32px 40px; text-align: center; }
+  h1 { font-size: 26px; margin-top: 0; }
+  p { line-height: 1.55; font-size: 15px; text-align: left; }
+  .contact-block { margin-top: 24px; padding-top: 16px; border-top: 1px solid #eee; font-size: 14px; color: #444; text-align: left; }
+  #devDownload { margin-top: 28px; padding: 14px 18px; border-radius: 8px; background: #fff3e0; border: 1px solid #ef6c00; font-size: 13px; text-align: left; }
+  #devDownload a { display: inline-block; margin-top: 8px; padding: 8px 16px; background: #ef6c00; color: white; border-radius: 6px; text-decoration: none; }
+</style>
+</head>
+<body>
+<div class="page-wrapper">
+
+  <h1>Thank You</h1>
+  <p>Thank you for taking part in this study. Your responses have been recorded.</p>
+  <p>As noted in the information sheet, there is no payment for this study. If you have any remaining questions, please don't hesitate to get in touch.</p>
+
+  <div class="contact-block">
+    <p>Researcher contact: <a href="mailto:s2070500@ed.ac.uk">s2070500@ed.ac.uk</a><br>
+    Participant rights / ethics queries: <a href="mailto:inf-ethics@inf.ed.ac.uk">inf-ethics@inf.ed.ac.uk</a></p>
+  </div>
+
+  <div id="devDownload"></div>
+
+</div>
+
+<script src="session-utils.js"></script>
+<script>
+  // TEMPORARY: this static site has no backend to actually receive
+  // participant data yet, so as a stand-in, offer a local download of
+  // the session's full record. Once a real data endpoint (e.g. a Google
+  // Apps Script / Firebase / server) is wired up, this block (and the
+  // download) should be replaced with an automatic submission and can
+  // be removed.
+  try {
+    var record = sessionStorage.getItem("finalRecord");
+    if (record) {
+      var blob = new Blob([record], { type: "application/json" });
+      var url = URL.createObjectURL(blob);
+      var box = document.getElementById("devDownload");
+      box.innerHTML =
+        "<strong>For researcher/testing use:</strong> this data currently has nowhere to be sent automatically. " +
+        "<a id='downloadLink' download='participant_record.json'>Download this session's data (JSON)</a>";
+      document.getElementById("downloadLink").href = url;
+    }
+  } catch (e) {}
+</script>
+</body>
+</html>

@@ -10,30 +10,45 @@
 const TRIALS_TOTAL = 15;
 
 /* Balanced set of 15 hidden rules, out of the larger space of possible
-   node/operator combinations:
-     - 5 single-feature rules   (IF [node]=ON THEN N4=ON)
-     - 5 conjunctive/disjunctive rules (IF A=ON AND/OR B=ON THEN N4=ON)
-     - 5 relational "match" rules (IF A and B are in the same state THEN N4=ON)
-   Balanced across which node(s) are involved and, for rule #2, across
-   AND vs OR. Order is randomized per participant at load time. */
+   node/operator/state combinations:
+     - 3 single-feature rules (IF [node]=ON THEN N4=ON) — one per node (N1, N2, N3),
+       no repeats, since there are only 3 possible single-feature rules.
+     - 6 conjunctive/disjunctive rules (IF A=ON AND/OR B=ON THEN N4=ON) — full
+       coverage of all 3 node pairs x 2 operators (AND/OR), no repeats.
+     - 3 pairwise "match" rules where both nodes must be OFF (IF A=OFF AND B=OFF
+       THEN N4=ON) — one per pair (N1-N2, N1-N3, N2-N3). This is a matching
+       relationship (both nodes share the same state), not a plain conjunction,
+       so it's classified as "match" rather than "conj" even though the truth
+       table looks like an AND of negations.
+     - 1 pairwise "match" rule where both nodes must be ON (N1 and N3 specifically).
+       NOTE: this has the identical truth table to the "conj AND N1,N3" rule above
+       (item 6) — it's kept as a deliberate duplicate-logic/different-label trial
+       rather than being made symmetric across all 3 pairs, per design choice.
+     - 2 x the 3-way relational "match" rule (N4 = ON when N1, N2, AND N3 are ALL in
+       the same state — all ON or all OFF). There's only one distinct 3-way
+       combination, so it's repeated to give the core relational-concept test
+       some weight, though less than the other categories since the both-ON
+       pairwise trial above took one of its slots.
+   Order is randomized per participant at load time. */
 const BASE_TRIALS = [
   { type: "single", node: "N1", description: "N1 = ON causes N4 to turn ON. N2 and N3 are irrelevant." },
   { type: "single", node: "N2", description: "N2 = ON causes N4 to turn ON. N1 and N3 are irrelevant." },
   { type: "single", node: "N3", description: "N3 = ON causes N4 to turn ON. N1 and N2 are irrelevant." },
-  { type: "single", node: "N1", description: "N1 = ON causes N4 to turn ON. N2 and N3 are irrelevant." },
-  { type: "single", node: "N2", description: "N2 = ON causes N4 to turn ON. N1 and N3 are irrelevant." },
 
   { type: "conj", op: "AND", nodes: ["N1", "N2"], description: "N1 AND N2 must both be ON for N4 to turn ON. N3 is irrelevant." },
-  { type: "conj", op: "OR",  nodes: ["N1", "N3"], description: "N1 OR N3 being ON is enough for N4 to turn ON. N2 is irrelevant." },
-  { type: "conj", op: "AND", nodes: ["N2", "N3"], description: "N2 AND N3 must both be ON for N4 to turn ON. N1 is irrelevant." },
   { type: "conj", op: "OR",  nodes: ["N1", "N2"], description: "N1 OR N2 being ON is enough for N4 to turn ON. N3 is irrelevant." },
   { type: "conj", op: "AND", nodes: ["N1", "N3"], description: "N1 AND N3 must both be ON for N4 to turn ON. N2 is irrelevant." },
+  { type: "conj", op: "OR",  nodes: ["N1", "N3"], description: "N1 OR N3 being ON is enough for N4 to turn ON. N2 is irrelevant." },
+  { type: "conj", op: "AND", nodes: ["N2", "N3"], description: "N2 AND N3 must both be ON for N4 to turn ON. N1 is irrelevant." },
+  { type: "conj", op: "OR",  nodes: ["N2", "N3"], description: "N2 OR N3 being ON is enough for N4 to turn ON. N1 is irrelevant." },
 
-  { type: "match", nodes: ["N1", "N2"], description: "N4 turns ON when N1 and N2 are in the same state (both ON or both OFF). N3 is irrelevant." },
-  { type: "match", nodes: ["N1", "N3"], description: "N4 turns ON when N1 and N3 are in the same state (both ON or both OFF). N2 is irrelevant." },
-  { type: "match", nodes: ["N2", "N3"], description: "N4 turns ON when N2 and N3 are in the same state (both ON or both OFF). N1 is irrelevant." },
-  { type: "match", nodes: ["N1", "N2"], description: "N4 turns ON when N1 and N2 are in the same state (both ON or both OFF). N3 is irrelevant." },
-  { type: "match", nodes: ["N1", "N3"], description: "N4 turns ON when N1 and N3 are in the same state (both ON or both OFF). N2 is irrelevant." }
+  { type: "match", state: "OFF", nodes: ["N1", "N2"], description: "N4 turns ON when N1 and N2 match by both being OFF. N3 is irrelevant." },
+  { type: "match", state: "OFF", nodes: ["N1", "N3"], description: "N4 turns ON when N1 and N3 match by both being OFF. N2 is irrelevant." },
+  { type: "match", state: "OFF", nodes: ["N2", "N3"], description: "N4 turns ON when N2 and N3 match by both being OFF. N1 is irrelevant." },
+  { type: "match", state: "ON", nodes: ["N1", "N3"], description: "N4 turns ON when N1 and N3 match by both being ON. N2 is irrelevant." },
+
+  { type: "match", nodes: ["N1", "N2", "N3"], description: "N4 turns ON when N1, N2, and N3 are all in the same state (all ON or all OFF)." },
+  { type: "match", nodes: ["N1", "N2", "N3"], description: "N4 turns ON when N1, N2, and N3 are all in the same state (all ON or all OFF)." }
 ];
 
 function shuffleArray(arr) {
@@ -71,12 +86,18 @@ function evaluateOutcome(rule, n1, n2, n3) {
   if (rule.type === "conj") {
     const a = state[rule.nodes[0]];
     const b = state[rule.nodes[1]];
-    return rule.op === "AND" ? (a && b) : (a || b);
+    return rule.op === "OR" ? (a || b) : (a && b);
   }
   if (rule.type === "match") {
-    const a = state[rule.nodes[0]];
-    const b = state[rule.nodes[1]];
-    return a === b;
+    const values = rule.nodes.map(function (n) { return state[n]; });
+    if (rule.state === "ON") {
+      return values.every(function (v) { return v === true; });
+    }
+    if (rule.state === "OFF") {
+      return values.every(function (v) { return v === false; });
+    }
+    // no specific state required: symmetric match (all equal, either all ON or all OFF)
+    return values.every(function (v) { return v === values[0]; });
   }
   return false;
 }
@@ -182,6 +203,7 @@ function submitTrial() {
     ruleType: rule.type,
     ruleNodes: rule.nodes || [rule.node],
     ruleOp: rule.op || null,
+    ruleState: rule.state || null,
     testHistory: testHistory.slice(),
     numberOfTests: testCount,
     chosenStrategy: chosenStrategy,
@@ -195,8 +217,8 @@ function submitTrial() {
   feedbackBox.style.display = "block";
   feedbackBox.className = "info";
   feedbackBox.innerHTML =
-    "<strong>Your answer:</strong> " + ruleGuess +
-    "<br><br><strong>The actual rule was:</strong> " + rule.description;
+    "<strong>Your answer has been recorded:</strong><br>" + ruleGuess +
+    "<br><br>Click “Next trial” when you're ready to continue. The correct rule is not shown, so that it doesn't influence later trials.";
 
   document.getElementById("submitTrialButton").style.display = "none";
   document.getElementById("nextTrialButton").style.display = "inline-block";
@@ -268,9 +290,18 @@ function startTrial() {
 function showSessionComplete() {
   document.getElementById("task-wrapper").innerHTML =
     "<h1>Session complete</h1>" +
-    "<p>Thank you for completing all trials.</p>" +
-    "<p style='font-size:14px;color:#555;'>" + sessionLog.length + " trials recorded. See console for full data log.</p>";
+    "<p>Thank you for completing all trials. Taking you to a few final questions...</p>";
   console.log("FULL SESSION LOG (" + CONDITION + "):", sessionLog);
+
+  try {
+    sessionStorage.setItem("taskSessionLog", JSON.stringify(sessionLog));
+    sessionStorage.setItem("taskCondition", CONDITION);
+  } catch (e) {}
+
+  var query = (typeof window.buildSessionQuery === "function") ? window.buildSessionQuery() : "";
+  window.setTimeout(function () {
+    window.location.href = "demographic.html" + query;
+  }, 1200);
 }
 
 /* ---------- Initialise ---------- */

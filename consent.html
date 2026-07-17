@@ -1,17 +1,125 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Welcome</title>
+<meta charset="UTF-8">
+<title>Participant Information &amp; Consent</title>
+<style>
+  body { font-family: Arial, sans-serif; margin: 0; padding: 40px 20px; background: #f7f7f8; color: #222; }
+  .page-wrapper { max-width: 680px; margin: 0 auto; background: #fff; border: 1px solid #ddd; border-radius: 10px; padding: 32px 40px; }
+  h1 { font-size: 24px; margin-top: 0; }
+  h2 { font-size: 17px; margin-top: 26px; margin-bottom: 8px; }
+  p, li { line-height: 1.55; font-size: 15px; }
+  ul { padding-left: 22px; }
+  .consent-question { border: 1px solid #ddd; border-radius: 8px; padding: 14px 18px; margin: 16px 0; background: #fafafa; }
+  .consent-question p.q-text { margin: 0 0 10px 0; font-weight: bold; }
+  .consent-question label { margin-right: 24px; font-weight: normal; cursor: pointer; }
+  button.primary { margin-top: 26px; padding: 12px 28px; font-size: 16px; background-color: #1565c0; color: white; border: none; border-radius: 6px; cursor: pointer; }
+  button.primary:disabled { background-color: #aaa; cursor: not-allowed; }
+  #declineMessage { display: none; margin-top: 20px; padding: 14px 18px; border-radius: 8px; background: #fdecea; border: 1px solid #c62828; }
+  .contact-block { margin-top: 24px; padding-top: 16px; border-top: 1px solid #eee; font-size: 14px; color: #444; }
+</style>
 </head>
 <body>
+<div class="page-wrapper" id="consent-wrapper">
 
-<h1>Welcome to the Experiment</h1>
+  <h1>Participant Information Sheet &amp; Consent</h1>
 
-<p>Click Start to begin.</p>
+  <h2>What is this document</h2>
+  <p>This document explains what kind of study we're conducting, what your rights are, and what will be done with your data.</p>
 
-<button onclick="location.href='trial1.html'">
-    Start
-</button>
+  <h2>Nature of the study</h2>
+  <p>You are invited to participate in an online study investigating how people learn and revise causal reasoning strategies. The study will be completed remotely through an online survey platform and will take approximately 18 minutes to complete. You are asked to use a laptop to complete the study.</p>
+  <p>During the study, you will view a series of visual displays and causal learning tasks. You will be asked to make judgments, selections, or decisions about causal relationships and may be asked to provide brief explanations for some of your choices. All responses will be submitted electronically through the online survey platform. No face-to-face interaction with the researcher is required. No audio or video recordings will be collected.</p>
+  <p>We will collect:</p>
+  <ul>
+    <li>your responses to the task;</li>
+    <li>response timings;</li>
+    <li>basic demographic information such as age range and gender (optional); and</li>
+    <li>a Prolific/worker ID solely to prevent duplicate participation and process compensation.</li>
+  </ul>
+  <p>We will not collect names, dates of birth, addresses, or other directly identifying personal information unless explicitly stated.</p>
 
+  <h2>Compensation</h2>
+  <p>You will not be paid for participating in this study.</p>
+
+  <h2>Risks and benefits</h2>
+  <p>There are no known risks to participation in this study. Other than the payment mentioned, there are no direct tangible benefits; however, you will be contributing to our knowledge about reasoning.</p>
+
+  <h2>Confidentiality and use of data</h2>
+  <p>All information collected during this study will be processed in accordance with UK Data Protection Law and the University of Edinburgh data protection policies. Participants will be identified using a unique participant number rather than their name. We will temporarily collect Prolific/worker IDs for participant management and prevention of repeat participation. These IDs will be stored separately from study responses and will not appear in research publications or shared datasets. The study data will be anonymised before analysis and publication. Only the research team will have access to identifiable information. All electronic data will be stored on password-protected University-approved storage systems accessible only to the research team. Data will be retained securely in accordance with University policy and then deleted or fully anonymised.</p>
+
+  <h2>What are my data protection rights</h2>
+  <p>The University of Edinburgh is a Data Controller for the information you provide. You have the right to access information held about you. Your right of access can be exercised in accordance with Data Protection Law. You also have other rights including rights of correction, erasure and objection. For more details, including the right to lodge a complaint with the Information Commissioner's Office, please visit <a href="https://www.ico.org.uk" target="_blank" rel="noopener">www.ico.org.uk</a>. Questions, comments and requests about your personal data can also be sent to the University Data Protection Officer at <a href="mailto:dpo@ed.ac.uk">dpo@ed.ac.uk</a>.</p>
+
+  <h2>Voluntary participation and right to withdraw</h2>
+  <p>Your participation is voluntary, and you may withdraw from the study at any time and for any reason. If you withdraw from the study during or after data gathering, we will delete your data and there is no penalty or loss of benefits to which you are otherwise entitled.</p>
+
+  <div class="contact-block">
+    <p>If you have any questions about what you've just read, please feel free to ask, or contact us later. You can contact us by email at <a href="mailto:s2070500@ed.ac.uk">s2070500@ed.ac.uk</a>. This project has been approved by the School of Informatics Ethics Committee. If you have questions or comments regarding your rights as a participant, they can be contacted at <a href="mailto:inf-ethics@inf.ed.ac.uk">inf-ethics@inf.ed.ac.uk</a>.</p>
+  </div>
+
+  <h2>By continuing, you confirm that:</h2>
+  <ul>
+    <li>I have read and understood the Participant Information Sheet for the above study, that I have had the opportunity to ask questions, and that any questions I had were answered to my satisfaction.</li>
+    <li>My participation is voluntary, and that I can withdraw at any time without giving a reason. Withdrawing will not affect any of my rights.</li>
+    <li>I consent to my anonymised data being used in academic publications and presentations.</li>
+    <li>I understand that my anonymised data will be stored for the duration outlined in the Participant Information Sheet.</li>
+    <li>I am 18 years old or older.</li>
+    <li>I understand that I have the right to terminate this session at any point.</li>
+  </ul>
+
+  <h2>Please tick yes or no for each of these statements.</h2>
+
+  <div class="consent-question">
+    <p class="q-text">1. I allow my data to be used in future ethically approved research.</p>
+    <label><input type="radio" name="q1" value="yes"> Yes</label>
+    <label><input type="radio" name="q1" value="no"> No</label>
+  </div>
+
+  <div class="consent-question">
+    <p class="q-text">2. I agree to take part in this study.</p>
+    <label><input type="radio" name="q2" value="yes"> Yes</label>
+    <label><input type="radio" name="q2" value="no"> No</label>
+  </div>
+
+  <button id="continueButton" class="primary" disabled onclick="handleContinue()">Continue</button>
+
+  <div id="declineMessage">
+    Thank you for your interest in this study. Since you have indicated that you do not wish to take part, no data will be collected from you and the study will now end. You may close this window.
+  </div>
+
+</div>
+
+<script src="session-utils.js"></script>
+<script>
+  function checkAnswered() {
+    var q1 = document.querySelector('input[name="q1"]:checked');
+    var q2 = document.querySelector('input[name="q2"]:checked');
+    document.getElementById("continueButton").disabled = !(q1 && q2);
+  }
+
+  document.querySelectorAll('input[name="q1"], input[name="q2"]').forEach(function (radio) {
+    radio.addEventListener("change", checkAnswered);
+  });
+
+  function handleContinue() {
+    var q1 = document.querySelector('input[name="q1"]:checked').value;
+    var q2 = document.querySelector('input[name="q2"]:checked').value;
+
+    if (q2 === "no") {
+      document.getElementById("consent-wrapper").querySelectorAll("h1, h2, p, ul, .consent-question, #continueButton").forEach(function (el) {
+        el.style.display = "none";
+      });
+      document.getElementById("declineMessage").style.display = "block";
+      return;
+    }
+
+    sessionStorage.setItem("consent_future_research", q1);
+    sessionStorage.setItem("consent_agreed", "yes");
+    sessionStorage.setItem("consent_timestamp", new Date().toISOString());
+
+    window.location.href = "description.html" + window.buildSessionQuery();
+  }
+</script>
 </body>
 </html>
