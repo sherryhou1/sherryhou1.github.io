@@ -71,7 +71,8 @@
   <div class="concept-block">
     <h3>2. Conjunctive / disjunctive concept</h3>
     <span class="rep">IF [node A] = [state] AND/OR [node B] = [state], THEN N4 turns ON.</span>
-    <p>Example (conjunctive): IF N1 = ON AND N2 = ON, THEN N4 = ON.</p>
+    <p>Example (conjunctive, ON): IF N1 = ON AND N2 = ON, THEN N4 = ON.</p>
+    <p>Example (conjunctive, OFF): IF N1 = OFF AND N2 = OFF, THEN N4 = ON. (Being ON does not help.)</p>
     <p>Example (disjunctive): IF N1 = ON OR N2 = ON, THEN N4 = ON.</p>
   </div>
 
@@ -165,6 +166,7 @@
 
 </div>
 
+<script src="session-utils.js"></script>
 <script>
   const CONDITION = "no-concept";
 </script>

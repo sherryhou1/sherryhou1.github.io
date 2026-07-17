@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Get Ready</title>
+<style>
+  body { font-family: Arial, sans-serif; margin: 0; padding: 40px 20px; background: #f7f7f8; color: #222; }
+  .page-wrapper { max-width: 680px; margin: 0 auto; background: #fff; border: 1px solid #ddd; border-radius: 10px; padding: 32px 40px; }
+  h1 { font-size: 24px; margin-top: 0; }
+  p { line-height: 1.55; font-size: 15px; }
+  button.primary { margin-top: 26px; padding: 12px 28px; font-size: 16px; background-color: #1565c0; color: white; border: none; border-radius: 6px; cursor: pointer; }
+  #devNotice { margin-top: 24px; padding: 12px 16px; border-radius: 8px; background: #fff3e0; border: 1px solid #ef6c00; font-size: 13px; display: none; }
+  #devNotice a { display: inline-block; margin-top: 8px; margin-right: 12px; }
+</style>
+</head>
+<body>
+<div class="page-wrapper">
+
+  <h1>Almost Ready</h1>
+
+  <p>Please use your laptop or computer to start the task.</p>
+  <p>You may spend approximately 20 minutes on the whole task.</p>
+  <p>Task 1 will start on the next page &mdash; please click the button below when you're ready.</p>
+  <p>Hope you will enjoy it!</p>
+
+  <button class="primary" id="startButton" onclick="goToTask()">Start Task</button>
+
+  <div id="devNotice"></div>
+
+</div>
+
+<script src="session-utils.js"></script>
+<script>
+  function goToTask() {
+    var cond = window.getSessionParam("cond");
+    var target = cond === "noconcept" ? "task_noconcept.html" : "task_concept.html";
+    window.location.href = target + window.buildSessionQuery();
+  }
+
+  // If no condition was specified in the URL, surface both options directly
+  // so this page still works for manual testing rather than silently
+  // defaulting everyone to the concept-given condition.
+  if (!window.getSessionParam("cond")) {
+    var notice = document.getElementById("devNotice");
+    notice.style.display = "block";
+    notice.innerHTML =
+      "No condition was specified in the link (expected a <code>?cond=concept</code> or <code>?cond=noconcept</code> parameter). " +
+      "Start Task will default to the concept-given condition, or pick one directly:<br>" +
+      "<a href='task_concept.html" + window.buildSessionQuery() + "'>Concept-given condition</a>" +
+      "<a href='task_noconcept.html" + window.buildSessionQuery() + "'>No-concept condition</a>";
+  }
+</script>
+</body>
+</html>

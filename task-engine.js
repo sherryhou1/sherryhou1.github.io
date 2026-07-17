@@ -300,7 +300,7 @@ function showSessionComplete() {
 
   var query = (typeof window.buildSessionQuery === "function") ? window.buildSessionQuery() : "";
   window.setTimeout(function () {
-    window.location.href = "demographic.html" + query;
+    window.location.href = "almost_done.html" + query;
   }, 1200);
 }
 
