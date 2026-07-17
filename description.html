@@ -9,9 +9,11 @@
   h1 { font-size: 24px; margin-top: 0; }
   p { line-height: 1.55; font-size: 15px; }
   .notice { margin: 18px 0; padding: 14px 18px; border-radius: 8px; background: #fff3e0; border: 1px solid #ef6c00; font-weight: bold; }
+  .error-notice { margin: 18px 0; padding: 14px 18px; border-radius: 8px; background: #fdecea; border: 1px solid #c62828; }
+  .error-notice p { margin: 0; }
   #ctaArea { margin-top: 26px; }
-  button.primary, a.primary { display: block; width: 100%; box-sizing: border-box; text-align: center; margin-top: 14px; padding: 12px 28px; font-size: 16px; background-color: #1565c0; color: white; border: none; border-radius: 6px; cursor: pointer; text-decoration: none; }
-  #ctaArea button.primary:first-child, #ctaArea a.primary:first-child { margin-top: 0; }
+  button.primary { display: block; width: 100%; box-sizing: border-box; text-align: center; margin-top: 14px; padding: 12px 28px; font-size: 16px; background-color: #1565c0; color: white; border: none; border-radius: 6px; cursor: pointer; text-decoration: none; }
+  button.primary:disabled { background-color: #aaa; cursor: not-allowed; }
 </style>
 </head>
 <body>
@@ -20,7 +22,8 @@
   <h1>Almost Ready</h1>
 
   <p>Please use your laptop or computer to start the task.</p>
-  <p>You may spend approximately 18 minutes on the whole task.</p>
+  <p>You may spend approximately 20 minutes on the whole task.</p>
+  <p>Task 1 will start on the next page &mdash; please click the button below when you're ready.</p>
   <p>Hope you will enjoy it!</p>
 
   <div id="ctaArea">
@@ -40,16 +43,16 @@
     window.location.href = target + window.buildSessionQuery();
   }
 
-  // If no condition was specified in the URL, don't silently default anyone
-  // into the concept-given condition. Instead, replace the single button
-  // with two explicit links at the bottom of the page so a manual tester
-  // (or a mis-tagged link) can't accidentally end up in the wrong condition.
+  // Participants must never be able to pick their own condition — that
+  // would break random assignment. A missing cond param means the link
+  // itself is wrong (or this is a bare/manual visit), so block progress
+  // entirely rather than letting anyone choose. For testing, navigate
+  // directly to task_concept.html or task_noconcept.html instead.
   if (!window.getSessionParam("cond")) {
-    var ctaArea = document.getElementById("ctaArea");
-    ctaArea.innerHTML =
-      "<p class='notice'>No condition was specified in this link. Please choose one below to continue:</p>" +
-      "<a class='primary' href='task_concept.html" + window.buildSessionQuery() + "' onclick=\"window.markStepComplete('description')\">Continue &mdash; Concept-given condition</a>" +
-      "<a class='primary' href='task_noconcept.html" + window.buildSessionQuery() + "' onclick=\"window.markStepComplete('description')\">Continue &mdash; No-concept condition</a>";
+    document.getElementById("ctaArea").innerHTML =
+      "<div class='error-notice'><p>This link is missing required information and can't continue automatically. " +
+      "Please make sure you used the exact link provided to you, or contact the researcher if the problem continues.</p></div>" +
+      "<button class='primary' disabled>Start Task</button>";
   }
 </script>
 </body>
