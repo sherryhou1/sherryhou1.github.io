@@ -66,7 +66,7 @@
   // removed, or reordered), a stale index would point at the wrong step
   // and silently misroute returning visitors. Changing this value forces
   // any old progress marker to be discarded instead.
-  var FLOW_VERSION = "2025-07-description-v2";
+  var FLOW_VERSION = "2025-07-description-v3-skipguard";
   if (sessionStorage.getItem("flowVersion") !== FLOW_VERSION) {
     sessionStorage.removeItem("furthestStepIndex");
     sessionStorage.setItem("flowVersion", FLOW_VERSION);
@@ -97,9 +97,15 @@
     }
   };
 
-  // Call at the top of every page. If the participant has already moved
-  // past this step, send them forward to where they currently are instead
-  // of letting them view/edit the stale page.
+  // Call at the top of every page. Two things are enforced:
+  //   1. If the participant has already moved past this step, send them
+  //      forward to where they currently are instead of letting them
+  //      view/edit the stale page.
+  //   2. If the participant jumps straight to a page without having
+  //      completed the step(s) before it (e.g. someone opens
+  //      description.html directly without going through consent.html
+  //      first), send them back to the step they're actually supposed
+  //      to be on.
   window.protectStep = function (step) {
     function check() {
       var idx = stepIndex(step);
@@ -108,6 +114,13 @@
         var nextFile = fileForStep(FLOW[furthest].step);
         if (nextFile) {
           window.location.replace(nextFile + window.buildSessionQuery());
+        }
+        return;
+      }
+      if (idx > furthest + 1) {
+        var resumeFile = fileForStep(FLOW[furthest + 1].step);
+        if (resumeFile) {
+          window.location.replace(resumeFile + window.buildSessionQuery());
         }
       }
     }
