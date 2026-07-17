@@ -52,7 +52,7 @@
      ---------------------------------------------------------- */
   var FLOW = [
     { step: "consent", file: "consent.html" },
-    { step: "get_ready", file: "get_ready.html" },
+    { step: "description", file: "description.html" },
     { step: "task", file: null }, // resolved dynamically below, depends on condition
     { step: "almost_done", file: "almost_done.html" },
     { step: "demographic", file: "demographic.html" },
