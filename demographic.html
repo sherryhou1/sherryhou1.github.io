@@ -42,6 +42,8 @@
 
 <script src="session-utils.js"></script>
 <script>
+  window.protectStep("demographic");
+
   function handleContinue() {
     var demographics = {
       age: document.getElementById("ageInput").value.trim(),
@@ -49,6 +51,7 @@
       education: document.getElementById("educationInput").value.trim()
     };
     sessionStorage.setItem("demographics", JSON.stringify(demographics));
+    window.markStepComplete("demographic");
     window.location.href = "feedback.html" + window.buildSessionQuery();
   }
 </script>

@@ -26,6 +26,8 @@
 
 <script src="session-utils.js"></script>
 <script>
+  window.protectStep("feedback");
+
   function handleContinue() {
     var feedbackText = document.getElementById("feedbackInput").value.trim();
     sessionStorage.setItem("feedbackText", feedbackText);
@@ -54,6 +56,7 @@
 
     sessionStorage.setItem("finalRecord", JSON.stringify(finalRecord));
     console.log("FINAL PARTICIPANT RECORD:", finalRecord);
+    window.markStepComplete("feedback");
 
     window.location.href = "thankyou.html" + window.buildSessionQuery();
   }

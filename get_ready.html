@@ -31,7 +31,10 @@
 
 <script src="session-utils.js"></script>
 <script>
+  window.protectStep("get_ready");
+
   function goToTask() {
+    window.markStepComplete("get_ready");
     var cond = window.getSessionParam("cond");
     var target = cond === "noconcept" ? "task_noconcept.html" : "task_concept.html";
     window.location.href = target + window.buildSessionQuery();

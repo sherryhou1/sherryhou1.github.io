@@ -11,6 +11,10 @@
   .concept-block h3 { margin-top: 0; }
   .rep { font-family: "Courier New", monospace; background: #eee; padding: 8px 10px; border-radius: 4px; display: block; margin: 8px 0; }
   #beginTaskButton { display: block; margin: 30px auto 10px; padding: 12px 28px; font-size: 16px; background-color: #1565c0; color: white; border: none; border-radius: 6px; }
+  .notice { margin: 18px 0; padding: 14px 18px; border-radius: 8px; background: #fff3e0; border: 1px solid #ef6c00; font-weight: bold; }
+  .node-diagram { text-align: center; margin: 22px 0; }
+  .node-diagram svg { width: 100%; max-width: 420px; }
+  .node-diagram-caption { font-size: 13px; color: #666; margin-top: 6px; }
 
   #task-wrapper { max-width: 480px; margin: 0 auto; display: none; }
   #trial-counter { font-size: 14px; color: #555; margin-bottom: 20px; font-weight: bold; }
@@ -25,10 +29,8 @@
   #message, #ruleMessage, #answerMessage { font-size: 18px; margin-top: 20px; }
   #history-box { text-align: left; max-width: 420px; margin: 16px auto; padding: 10px 14px; border: 1px solid #ccc; border-radius: 8px; background: #fafafa; font-size: 13px; max-height: 140px; overflow-y: auto; }
   #history-box div { padding: 2px 0; border-bottom: 1px solid #eee; }
-  .choice { display: block; width: 420px; margin: 10px auto; padding: 12px; font-size: 16px; cursor: pointer; text-align: left; }
-  .choice.selected { border: 2px solid #333; background-color: #e8e8e8; font-weight: bold; }
-  #rule-input-container { max-width: 420px; margin: 0 auto; text-align: left; }
-  #ruleTextInput { width: 100%; font-size: 15px; padding: 10px; box-sizing: border-box; font-family: Arial, sans-serif; resize: vertical; }
+  #strategy-input-container, #rule-input-container { max-width: 420px; margin: 0 auto; text-align: left; }
+  #strategyTextInput, #ruleTextInput { width: 100%; font-size: 15px; padding: 10px; box-sizing: border-box; font-family: Arial, sans-serif; resize: vertical; }
   button { cursor: pointer; }
   #testButton { margin-top: 20px; padding: 10px 24px; font-size: 16px; background-color: #ef6c00; color: white; border: none; border-radius: 6px; }
   #testButton:disabled { background-color: #aaa; cursor: not-allowed; }
@@ -47,18 +49,52 @@
 
 <div id="instructions-screen">
   <h1>Task Instructions</h1>
+
+  <p class="notice">Please read the instructions very carefully before starting the task.</p>
+
   <p>
-    You will play the role of an engineer investigating an unfamiliar machine.
-    The machine has four nodes: <strong>N1</strong>, <strong>N2</strong>, and <strong>N3</strong> are
-    switches you can turn <strong>ON</strong> or <strong>OFF</strong>. <strong>N4</strong> is an outcome
-    light controlled by a hidden rule that depends on some combination of N1, N2, and N3.
+    In the next part of the study, you will play the role of an engineer investigating an
+    unfamiliar machine with four nodes: <strong>N1</strong>, <strong>N2</strong>, and <strong>N3</strong>
+    are switches you can turn <strong>ON</strong> or <strong>OFF</strong>, and <strong>N4</strong> is an
+    outcome light controlled by a hidden rule that depends on some combination of N1, N2, and N3.
   </p>
+
+  <div class="node-diagram">
+    <svg viewBox="0 0 440 220" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <marker id="arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+          <path d="M0,0 L10,5 L0,10 z" fill="#555"></path>
+        </marker>
+      </defs>
+      <line x1="80" y1="85" x2="205" y2="145" stroke="#555" stroke-width="2" marker-end="url(#arrow)"></line>
+      <line x1="220" y1="85" x2="220" y2="130" stroke="#555" stroke-width="2" marker-end="url(#arrow)"></line>
+      <line x1="360" y1="85" x2="235" y2="145" stroke="#555" stroke-width="2" marker-end="url(#arrow)"></line>
+
+      <circle cx="80" cy="50" r="35" fill="grey" stroke="black" stroke-width="3"></circle>
+      <text x="80" y="56" text-anchor="middle" font-size="16" font-weight="bold" fill="white">N1</text>
+
+      <circle cx="220" cy="50" r="35" fill="grey" stroke="black" stroke-width="3"></circle>
+      <text x="220" y="56" text-anchor="middle" font-size="16" font-weight="bold" fill="white">N2</text>
+
+      <circle cx="360" cy="50" r="35" fill="grey" stroke="black" stroke-width="3"></circle>
+      <text x="360" y="56" text-anchor="middle" font-size="16" font-weight="bold" fill="white">N3</text>
+
+      <circle cx="220" cy="170" r="40" fill="#ddd" stroke="black" stroke-width="3" stroke-dasharray="6,4"></circle>
+      <text x="220" y="176" text-anchor="middle" font-size="16" font-weight="bold" fill="#333">N4</text>
+      <text x="220" y="205" text-anchor="middle" font-size="12" fill="#666">outcome (hidden rule)</text>
+    </svg>
+    <p class="node-diagram-caption">N1, N2, and N3 are switches you control. N4 is the outcome light &mdash; its hidden rule is what you'll be trying to discover.</p>
+  </div>
+
   <p>
-    There will be <strong>15 trials</strong>. On each trial the machine has a new hidden rule.
-    Your job is to run tests &mdash; set the switches however you like, then press
-    <strong>Test</strong> to see whether N4 turns ON &mdash; for as long as you like, until you feel
-    ready to describe the rule in your own words.
+    There will be <strong>15 trials</strong>. On each trial, the machine has a new hidden rule.
+    You can test the machine as many times as you like &mdash; set the switches however you like,
+    then press <strong>Test</strong> to see whether N4 turns ON &mdash; before typing out, in your own
+    words, what you think the hidden rule is. There is no right or wrong way to explore, just do
+    what feels natural to you.
   </p>
+
+  <p>The task takes most of the study's time, so please find a moment when you can focus without interruption.</p>
 
   <h2>Kinds of rules you may encounter</h2>
   <p>Each trial's hidden rule will be one of the following three kinds:</p>
@@ -134,26 +170,12 @@
   <button id="resetButton" onclick="resetNodes()">Reset switches</button>
 
   <hr>
-  <h2>Before the test, what were you thinking when you chose this test?</h2>
+  <h2>Could you briefly explain how you start the exam that determines your selection?</h2>
   <p>
-    Please choose the option that best describes your choice.
+    For example, it can be a short sentence like: "I just start with a random guess" or "I found both N1 and N2 activate N4."
   </p>
-  <div id="strategy-choices">
-    <button class="choice" data-strategy="explore" onclick="chooseStrategy('explore', this)">
-      I was exploring because I was not yet sure how the switches work.
-    </button>
-    <button class="choice" data-strategy="confirm" onclick="chooseStrategy('confirm', this)">
-      I wanted to check whether my current idea was correct.
-    </button>
-    <button class="choice" data-strategy="compare" onclick="chooseStrategy('compare', this)">
-      I changed exactly one switch from my last test to see what difference it makes.
-    </button>
-    <button class="choice" data-strategy="interaction" onclick="chooseStrategy('interaction', this)">
-      I wanted to see whether multiple switches work together.
-    </button>
-    <button class="choice" data-strategy="uncertain" onclick="chooseStrategy('uncertain', this)">
-      I thought the rule might require more than one switch, so I tested a combination.
-    </button>
+  <div id="strategy-input-container">
+    <textarea id="strategyTextInput" rows="3" placeholder="Describe your reasoning here..." oninput="onStrategyTextInput()"></textarea>
   </div>
   <p id="answerMessage"></p>
   <hr>

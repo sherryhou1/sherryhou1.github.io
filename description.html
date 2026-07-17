@@ -29,7 +29,10 @@
 
 <script src="session-utils.js"></script>
 <script>
+  window.protectStep("description");
+
   function goToReady() {
+    window.markStepComplete("description");
     window.location.href = "get_ready.html" + window.buildSessionQuery();
   }
 </script>

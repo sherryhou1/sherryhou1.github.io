@@ -24,7 +24,10 @@
 
 <script src="session-utils.js"></script>
 <script>
+  window.protectStep("almost_done");
+
   function goToDemographic() {
+    window.markStepComplete("almost_done");
     window.location.href = "demographic.html" + window.buildSessionQuery();
   }
 </script>

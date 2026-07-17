@@ -92,6 +92,8 @@
 
 <script src="session-utils.js"></script>
 <script>
+  window.protectStep("consent");
+
   function checkAnswered() {
     var q1 = document.querySelector('input[name="q1"]:checked');
     var q2 = document.querySelector('input[name="q2"]:checked');
@@ -117,8 +119,9 @@
     sessionStorage.setItem("consent_future_research", q1);
     sessionStorage.setItem("consent_agreed", "yes");
     sessionStorage.setItem("consent_timestamp", new Date().toISOString());
+    window.markStepComplete("consent");
 
-    window.location.href = "description.html" + window.buildSessionQuery();
+    window.location.href = "get_ready.html" + window.buildSessionQuery();
   }
 </script>
 </body>

@@ -4,8 +4,14 @@
    task_noconcept.html (no-concept condition).
 
    Expects a global `CONDITION` variable ("concept-given" | "no-concept")
-   to be set in the page BEFORE this script is loaded.
+   to be set in the page BEFORE this script is loaded, and
+   session-utils.js to already be loaded (for protectStep/markStepComplete
+   and PROLIFIC_PID/cond propagation).
    ============================================================ */
+
+if (typeof window.protectStep === "function") {
+  window.protectStep("task");
+}
 
 const TRIALS_TOTAL = 15;
 
@@ -71,7 +77,6 @@ let stateD = false; // N3
 let outcomeOn = false; // N4
 
 let testHistory = []; // history within the current trial
-let chosenStrategy = null;
 let testCount = 0;
 
 /* ---------- Data log across the whole session ---------- */
@@ -133,7 +138,7 @@ function runTest() {
   logHistoryRow(entry);
   document.getElementById("message").innerText = outcomeOn ? "N4 turned ON." : "N4 is OFF.";
   document.getElementById("submitTrialButton").disabled =
-    !(chosenStrategy !== null && testCount > 0 && ruleTextEntered());
+    !(strategyTextEntered() && testCount > 0 && ruleTextEntered());
 }
 
 function updateNodeDisplay() {
@@ -167,15 +172,18 @@ function resetNodes() {
   document.getElementById("message").innerText = "Set the switches, then click Test.";
 }
 
-/* ---------- Strategy choice ---------- */
-function chooseStrategy(strategy, btn) {
-  chosenStrategy = strategy;
-  document.querySelectorAll("#strategy-choices .choice").forEach(function (b) {
-    b.classList.remove("selected");
-  });
-  btn.classList.add("selected");
+/* ---------- Strategy free-text response ---------- */
+function strategyTextEntered() {
+  return document.getElementById("strategyTextInput").value.trim().length > 0;
+}
+
+function getStrategyText() {
+  return document.getElementById("strategyTextInput").value.trim();
+}
+
+function onStrategyTextInput() {
   document.getElementById("submitTrialButton").disabled =
-    !(chosenStrategy !== null && testCount > 0 && ruleTextEntered());
+    !(strategyTextEntered() && testCount > 0 && ruleTextEntered());
 }
 
 /* ---------- Hidden rule free-text response ---------- */
@@ -189,7 +197,7 @@ function getRuleText() {
 
 function onRuleTextInput() {
   document.getElementById("submitTrialButton").disabled =
-    !(chosenStrategy !== null && testCount > 0 && ruleTextEntered());
+    !(strategyTextEntered() && testCount > 0 && ruleTextEntered());
 }
 
 /* ---------- Trial submission and feedback ---------- */
@@ -206,7 +214,7 @@ function submitTrial() {
     ruleState: rule.state || null,
     testHistory: testHistory.slice(),
     numberOfTests: testCount,
-    chosenStrategy: chosenStrategy,
+    strategyText: getStrategyText(),
     ruleGuess: ruleGuess,
     correctRuleDescription: rule.description
   };
@@ -223,7 +231,7 @@ function submitTrial() {
   document.getElementById("submitTrialButton").style.display = "none";
   document.getElementById("nextTrialButton").style.display = "inline-block";
 
-  document.querySelectorAll("#strategy-choices .choice").forEach(function (b) { b.disabled = true; });
+  document.getElementById("strategyTextInput").disabled = true;
   document.getElementById("ruleTextInput").disabled = true;
   document.getElementById("testButton").disabled = true;
 
@@ -251,17 +259,15 @@ function startTrial() {
   stateD = false;
   outcomeOn = false;
   testHistory = [];
-  chosenStrategy = null;
   testCount = 0;
 
   updateNodeDisplay();
   document.getElementById("history-log").innerHTML = "";
   document.getElementById("message").innerText = "Set the switches, then click Test.";
 
-  document.querySelectorAll("#strategy-choices .choice").forEach(function (b) {
-    b.classList.remove("selected");
-    b.disabled = false;
-  });
+  const strategyInput = document.getElementById("strategyTextInput");
+  strategyInput.value = "";
+  strategyInput.disabled = false;
 
   const ruleInput = document.getElementById("ruleTextInput");
   ruleInput.value = "";
@@ -297,6 +303,10 @@ function showSessionComplete() {
     sessionStorage.setItem("taskSessionLog", JSON.stringify(sessionLog));
     sessionStorage.setItem("taskCondition", CONDITION);
   } catch (e) {}
+
+  if (typeof window.markStepComplete === "function") {
+    window.markStepComplete("task");
+  }
 
   var query = (typeof window.buildSessionQuery === "function") ? window.buildSessionQuery() : "";
   window.setTimeout(function () {
