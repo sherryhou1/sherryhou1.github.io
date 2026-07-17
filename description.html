@@ -2,28 +2,31 @@
 <html>
 <head>
 <meta charset="UTF-8">
-<title>Task Description</title>
+<title>Before You Begin</title>
 <style>
   body { font-family: Arial, sans-serif; margin: 0; padding: 40px 20px; background: #f7f7f8; color: #222; }
   .page-wrapper { max-width: 680px; margin: 0 auto; background: #fff; border: 1px solid #ddd; border-radius: 10px; padding: 32px 40px; }
   h1 { font-size: 24px; margin-top: 0; }
-  p, li { line-height: 1.55; font-size: 15px; }
+  p { line-height: 1.55; font-size: 15px; }
   .notice { margin: 18px 0; padding: 14px 18px; border-radius: 8px; background: #fff3e0; border: 1px solid #ef6c00; font-weight: bold; }
-  button.primary { margin-top: 26px; padding: 12px 28px; font-size: 16px; background-color: #1565c0; color: white; border: none; border-radius: 6px; cursor: pointer; }
+  #ctaArea { margin-top: 26px; }
+  button.primary, a.primary { display: block; width: 100%; box-sizing: border-box; text-align: center; margin-top: 14px; padding: 12px 28px; font-size: 16px; background-color: #1565c0; color: white; border: none; border-radius: 6px; cursor: pointer; text-decoration: none; }
+  #ctaArea button.primary:first-child, #ctaArea a.primary:first-child { margin-top: 0; }
 </style>
 </head>
 <body>
 <div class="page-wrapper">
 
-  <h1>Task Description</h1>
+  <h1>Almost Ready</h1>
 
-  <p class="notice">Please read the instructions carefully before starting the task.</p>
+  <p>Please use your laptop or computer to start the task.</p>
+  <p>You may spend approximately 20 minutes on the whole task.</p>
+  <p>Task 1 will start on the next page &mdash; please click the button below when you're ready.</p>
+  <p>Hope you will enjoy it!</p>
 
-  <p>In the next part of the study, you will play the role of an engineer investigating an unfamiliar machine with four nodes. Three of the nodes are switches you can turn ON or OFF, and the fourth is an outcome light controlled by a hidden rule.</p>
-  <p>You will run a series of trials. On each trial, the rule for the machine will be different. You can test the machine as many times as you like before typing out, in your own words, what you think the hidden rule is. There is no right or wrong way to explore &mdash; just do what feels natural to you.</p>
-  <p>The task will take approximately 18 minutes; please find a moment when you can focus without interruption.</p>
-
-  <button class="primary" id="continueButton" onclick="goToReady()">Continue</button>
+  <div id="ctaArea">
+    <button class="primary" id="startButton" onclick="goToTask()">Start Task</button>
+  </div>
 
 </div>
 
@@ -31,9 +34,23 @@
 <script>
   window.protectStep("description");
 
-  function goToReady() {
+  function goToTask() {
     window.markStepComplete("description");
-    window.location.href = "get_ready.html" + window.buildSessionQuery();
+    var cond = window.getSessionParam("cond");
+    var target = cond === "noconcept" ? "task_noconcept.html" : "task_concept.html";
+    window.location.href = target + window.buildSessionQuery();
+  }
+
+  // If no condition was specified in the URL, don't silently default anyone
+  // into the concept-given condition. Instead, replace the single button
+  // with two explicit links at the bottom of the page so a manual tester
+  // (or a mis-tagged link) can't accidentally end up in the wrong condition.
+  if (!window.getSessionParam("cond")) {
+    var ctaArea = document.getElementById("ctaArea");
+    ctaArea.innerHTML =
+      "<p class='notice'>No condition was specified in this link. Please choose one below to continue:</p>" +
+      "<a class='primary' href='task_concept.html" + window.buildSessionQuery() + "' onclick=\"window.markStepComplete('description')\">Continue &mdash; Concept-given condition</a>" +
+      "<a class='primary' href='task_noconcept.html" + window.buildSessionQuery() + "' onclick=\"window.markStepComplete('description')\">Continue &mdash; No-concept condition</a>";
   }
 </script>
 </body>
