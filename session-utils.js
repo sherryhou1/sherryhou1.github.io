@@ -60,6 +60,18 @@
     { step: "thankyou", file: "thankyou.html" }
   ];
 
+  // Bump this whenever FLOW's steps/order change. A "furthestStepIndex"
+  // saved in sessionStorage only makes sense relative to the exact FLOW
+  // it was recorded against — if the flow is edited later (pages added,
+  // removed, or reordered), a stale index would point at the wrong step
+  // and silently misroute returning visitors. Changing this value forces
+  // any old progress marker to be discarded instead.
+  var FLOW_VERSION = "2025-07-description-v2";
+  if (sessionStorage.getItem("flowVersion") !== FLOW_VERSION) {
+    sessionStorage.removeItem("furthestStepIndex");
+    sessionStorage.setItem("flowVersion", FLOW_VERSION);
+  }
+
   function stepIndex(step) {
     for (var i = 0; i < FLOW.length; i++) {
       if (FLOW[i].step === step) { return i; }
