@@ -10,6 +10,7 @@
   p { line-height: 1.55; font-size: 15px; text-align: left; }
   .contact-block { margin-top: 24px; padding-top: 16px; border-top: 1px solid #eee; font-size: 14px; color: #444; text-align: left; }
   #devDownload { margin-top: 28px; padding: 14px 18px; border-radius: 8px; background: #fff3e0; border: 1px solid #ef6c00; font-size: 13px; text-align: left; }
+  #devDownload.saved { background: #e8f5e9; border: 1px solid #2e7d32; }
   #devDownload a { display: inline-block; margin-top: 8px; padding: 8px 16px; background: #ef6c00; color: white; border-radius: 6px; text-decoration: none; }
 </style>
 </head>
@@ -34,22 +35,28 @@
 <script>
   window.protectStep("thankyou");
 
-  // TEMPORARY: this static site has no backend to actually receive
-  // participant data yet, so as a stand-in, offer a local download of
-  // the session's full record. Once a real data endpoint (e.g. a Google
-  // Apps Script / Firebase / server) is wired up, this block (and the
-  // download) should be replaced with an automatic submission and can
-  // be removed.
+  // Data is now saved to Firestore from feedback.html before reaching this
+  // page. This block just reports whether that save succeeded, and keeps a
+  // local JSON download available as a fallback if it didn't (e.g. network
+  // issue, ad blocker, or a Firestore rules problem).
   try {
     var record = sessionStorage.getItem("finalRecord");
+    var saved = sessionStorage.getItem("dataSaved");
+    var box = document.getElementById("devDownload");
+
     if (record) {
-      var blob = new Blob([record], { type: "application/json" });
-      var url = URL.createObjectURL(blob);
-      var box = document.getElementById("devDownload");
-      box.innerHTML =
-        "<strong>For researcher/testing use:</strong> this data currently has nowhere to be sent automatically. " +
-        "<a id='downloadLink' download='participant_record.json'>Download this session's data (JSON)</a>";
-      document.getElementById("downloadLink").href = url;
+      if (saved === "yes") {
+        box.className = "saved";
+        box.innerHTML = "<strong>&#10003; Your data was saved successfully.</strong>";
+      } else {
+        var blob = new Blob([record], { type: "application/json" });
+        var url = URL.createObjectURL(blob);
+        box.innerHTML =
+          "<strong>Note:</strong> we couldn't confirm your data reached our database automatically. " +
+          "As a backup, you can download it here and send it to the researcher: " +
+          "<a id='downloadLink' download='participant_record.json'>Download this session's data (JSON)</a>";
+        document.getElementById("downloadLink").href = url;
+      }
     }
   } catch (e) {}
 </script>

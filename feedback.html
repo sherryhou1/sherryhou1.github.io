@@ -10,6 +10,7 @@
   p { line-height: 1.55; font-size: 15px; }
   textarea { width: 100%; min-height: 160px; font-size: 15px; padding: 10px; box-sizing: border-box; font-family: Arial, sans-serif; border: 1px solid #ccc; border-radius: 6px; resize: vertical; }
   button.primary { margin-top: 26px; padding: 12px 28px; font-size: 16px; background-color: #1565c0; color: white; border: none; border-radius: 6px; cursor: pointer; }
+  button.primary:disabled { background-color: #aaa; cursor: not-allowed; }
 </style>
 </head>
 <body>
@@ -25,10 +26,48 @@
 </div>
 
 <script src="session-utils.js"></script>
+
+<!-- Firebase: saves the final participant record to Firestore. -->
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+  import {
+    getFirestore,
+    collection,
+    addDoc,
+    serverTimestamp
+  } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+  var firebaseConfig = {
+    apiKey: "AIzaSyDEYtZK3iqP1Y7DeaNdutUK5Gh3OheArYE",
+    authDomain: "active-intervention.firebaseapp.com",
+    projectId: "active-intervention",
+    storageBucket: "active-intervention.firebasestorage.app",
+    messagingSenderId: "842742804191",
+    appId: "1:842742804191:web:b75a700a06d0831043436a",
+    measurementId: "G-43QPJPH15Q"
+  };
+
+  var app = initializeApp(firebaseConfig);
+  var db = getFirestore(app);
+
+  // Exposed for the plain script block below (which isn't a module) to call.
+  window.__saveRecordToFirestore = async function (record) {
+    try {
+      await addDoc(collection(db, "participants"), Object.assign({}, record, {
+        savedAt: serverTimestamp()
+      }));
+      return true;
+    } catch (err) {
+      console.error("Firestore save failed:", err);
+      return false;
+    }
+  };
+</script>
+
 <script>
   window.protectStep("feedback");
 
-  function handleContinue() {
+  async function handleContinue() {
     var feedbackText = document.getElementById("feedbackInput").value.trim();
     sessionStorage.setItem("feedbackText", feedbackText);
 
@@ -57,6 +96,16 @@
     sessionStorage.setItem("finalRecord", JSON.stringify(finalRecord));
     console.log("FINAL PARTICIPANT RECORD:", finalRecord);
     window.markStepComplete("feedback");
+
+    var btn = document.getElementById("continueButton");
+    btn.disabled = true;
+    btn.innerText = "Saving...";
+
+    var saved = false;
+    if (typeof window.__saveRecordToFirestore === "function") {
+      saved = await window.__saveRecordToFirestore(finalRecord);
+    }
+    sessionStorage.setItem("dataSaved", saved ? "yes" : "no");
 
     window.location.href = "thankyou.html" + window.buildSessionQuery();
   }
