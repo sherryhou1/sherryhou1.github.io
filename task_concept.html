@@ -98,12 +98,36 @@
     There will be <strong>15 trials</strong>. On each trial, the machine has a new hidden rule.
     You can test the machine up to <strong>7 times</strong> per trial &mdash; set the switches however you like,
     then press <strong>Test</strong> to see whether N4 turns ON &mdash; before typing out, in your own
-    words, what you think the hidden rule is. The kinds of rules you may encounter are listed in a panel
-    on the side of the page throughout the task. There is no right or wrong way to explore, just do
+    words, what you think the hidden rule is. There is no right or wrong way to explore, just do
     what feels natural to you.
   </p>
 
   <p>The task takes most of the study's time, so please find a moment when you can focus without interruption.</p>
+
+  <h2>Kinds of rules you may encounter</h2>
+  <p>Each trial's hidden rule will be one of the following three kinds:</p>
+
+  <div class="concept-block">
+    <h3>1. Single-feature concept</h3>
+    <span class="rep">IF [node] = [state], THEN N4 turns ON.</span>
+    <p>Example: IF N1 = ON, THEN N4 = ON. (N2 and N3 would not matter.)</p>
+  </div>
+
+  <div class="concept-block">
+    <h3>2. Conjunctive / disjunctive concept</h3>
+    <span class="rep">IF [node A] = [state] AND/OR [node B] = [state], THEN N4 turns ON.</span>
+    <p>Example (conjunctive, ON): IF N1 = ON AND N2 = ON, THEN N4 = ON.</p>
+    <p>Example (conjunctive, OFF): IF N1 = OFF AND N2 = OFF, THEN N4 = ON. (Being ON does not help.)</p>
+    <p>Example (disjunctive): IF N1 = ON OR N2 = ON, THEN N4 = ON.</p>
+  </div>
+
+  <div class="concept-block">
+    <h3>3. Relational ("Match") concept</h3>
+    <span class="rep">IF [node A], [node B], and [node C] are all in the SAME state (all ON or all OFF), THEN N4 turns ON.</span>
+    <p>Example: IF N1, N2, and N3 all match (all ON or all OFF), THEN N4 = ON.</p>
+  </div>
+
+  <p>These three kinds will also stay visible in a panel on the side of the page during the task.</p>
 
   <button id="beginTaskButton" onclick="beginTask()">Begin task</button>
 </div>
