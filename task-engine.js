@@ -70,6 +70,10 @@ const TRIALS = shuffleArray(BASE_TRIALS);
 
 let trialIndex = 1; // 1-indexed, 1..TRIALS_TOTAL
 
+/* Max Test clicks per trial. Only the concept-given group is limited (7);
+   the no-concept group can test as many times as they like. */
+const MAX_TESTS = (CONDITION === "concept-given") ? 7 : Infinity;
+
 /* ---------- Node / outcome state ---------- */
 let stateA = false; // N1
 let stateB = false; // N2
@@ -111,6 +115,8 @@ function evaluateOutcome(rule, n1, n2, n3) {
 function beginTask() {
   document.getElementById("instructions-screen").style.display = "none";
   document.getElementById("task-wrapper").style.display = "block";
+  const panel = document.getElementById("rules-panel");
+  if (panel) { panel.style.display = "block"; }
   startTrial();
 }
 
@@ -128,7 +134,15 @@ function intervene(node) {
 }
 
 /* ---------- Test button ---------- */
+function updateTestCounter() {
+  const el = document.getElementById("test-counter");
+  if (el && MAX_TESTS !== Infinity) {
+    el.innerText = "Tests used: " + testCount + " / " + MAX_TESTS;
+  }
+}
+
 function runTest() {
+  if (testCount >= MAX_TESTS) { return; }
   const rule = TRIALS[trialIndex - 1];
   outcomeOn = evaluateOutcome(rule, stateA, stateB, stateD);
   updateNodeDisplay();
@@ -137,8 +151,13 @@ function runTest() {
   testHistory.push(entry);
   logHistoryRow(entry);
   document.getElementById("message").innerText = outcomeOn ? "N4 turned ON." : "N4 is OFF.";
+  updateTestCounter();
+  if (testCount >= MAX_TESTS) {
+    document.getElementById("testButton").disabled = true;
+    document.getElementById("message").innerText += " You have used all " + MAX_TESTS + " tests for this trial. Please describe the rule below.";
+  }
   document.getElementById("submitTrialButton").disabled =
-    !(strategyTextEntered() && testCount > 0 && ruleTextEntered());
+    !(testCount > 0 && ruleTextEntered());
 }
 
 function updateNodeDisplay() {
@@ -172,20 +191,6 @@ function resetNodes() {
   document.getElementById("message").innerText = "Set the switches, then click Test.";
 }
 
-/* ---------- Strategy free-text response ---------- */
-function strategyTextEntered() {
-  return document.getElementById("strategyTextInput").value.trim().length > 0;
-}
-
-function getStrategyText() {
-  return document.getElementById("strategyTextInput").value.trim();
-}
-
-function onStrategyTextInput() {
-  document.getElementById("submitTrialButton").disabled =
-    !(strategyTextEntered() && testCount > 0 && ruleTextEntered());
-}
-
 /* ---------- Hidden rule free-text response ---------- */
 function ruleTextEntered() {
   return document.getElementById("ruleTextInput").value.trim().length > 0;
@@ -197,7 +202,7 @@ function getRuleText() {
 
 function onRuleTextInput() {
   document.getElementById("submitTrialButton").disabled =
-    !(strategyTextEntered() && testCount > 0 && ruleTextEntered());
+    !(testCount > 0 && ruleTextEntered());
 }
 
 /* ---------- Trial submission and feedback ---------- */
@@ -214,7 +219,6 @@ function submitTrial() {
     ruleState: rule.state || null,
     testHistory: testHistory.slice(),
     numberOfTests: testCount,
-    strategyText: getStrategyText(),
     ruleGuess: ruleGuess,
     correctRuleDescription: rule.description
   };
@@ -231,7 +235,6 @@ function submitTrial() {
   document.getElementById("submitTrialButton").style.display = "none";
   document.getElementById("nextTrialButton").style.display = "inline-block";
 
-  document.getElementById("strategyTextInput").disabled = true;
   document.getElementById("ruleTextInput").disabled = true;
   document.getElementById("testButton").disabled = true;
 
@@ -265,10 +268,6 @@ function startTrial() {
   document.getElementById("history-log").innerHTML = "";
   document.getElementById("message").innerText = "Set the switches, then click Test.";
 
-  const strategyInput = document.getElementById("strategyTextInput");
-  strategyInput.value = "";
-  strategyInput.disabled = false;
-
   const ruleInput = document.getElementById("ruleTextInput");
   ruleInput.value = "";
   ruleInput.disabled = false;
@@ -281,6 +280,7 @@ function startTrial() {
   document.getElementById("D").onclick = function () { intervene("D"); };
 
   document.getElementById("testButton").disabled = false;
+  updateTestCounter();
   document.getElementById("submitTrialButton").disabled = true;
   document.getElementById("submitTrialButton").style.display = "inline-block";
   document.getElementById("nextTrialButton").style.display = "none";
@@ -294,6 +294,8 @@ function startTrial() {
 }
 
 function showSessionComplete() {
+  const panel = document.getElementById("rules-panel");
+  if (panel) { panel.style.display = "none"; }
   document.getElementById("task-wrapper").innerHTML =
     "<h1>Session complete</h1>" +
     "<p>Thank you for completing all trials. Taking you to a few final questions...</p>";

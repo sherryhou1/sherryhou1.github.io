@@ -29,8 +29,8 @@
   #message, #ruleMessage, #answerMessage { font-size: 18px; margin-top: 20px; }
   #history-box { text-align: left; max-width: 420px; margin: 16px auto; padding: 10px 14px; border: 1px solid #ccc; border-radius: 8px; background: #fafafa; font-size: 13px; max-height: 140px; overflow-y: auto; }
   #history-box div { padding: 2px 0; border-bottom: 1px solid #eee; }
-  #strategy-input-container, #rule-input-container { max-width: 420px; margin: 0 auto; text-align: left; }
-  #strategyTextInput, #ruleTextInput { width: 100%; font-size: 15px; padding: 10px; box-sizing: border-box; font-family: Arial, sans-serif; resize: vertical; }
+  #rule-input-container { max-width: 420px; margin: 0 auto; text-align: left; }
+  #ruleTextInput { width: 100%; font-size: 15px; padding: 10px; box-sizing: border-box; font-family: Arial, sans-serif; resize: vertical; }
   button { cursor: pointer; }
   #testButton { margin-top: 20px; padding: 10px 24px; font-size: 16px; background-color: #ef6c00; color: white; border: none; border-radius: 6px; }
   #testButton:disabled { background-color: #aaa; cursor: not-allowed; }
@@ -41,6 +41,14 @@
   #feedback-box { max-width: 420px; margin: 16px auto; padding: 14px; border-radius: 8px; font-size: 15px; display: none; text-align: left; }
   #feedback-box.info { background-color: #e3f2fd; border: 1px solid #1565c0; }
   hr { max-width: 420px; margin: 30px auto; }
+  #rules-panel { display: none; position: fixed; top: 30px; right: 20px; width: 280px; max-height: calc(100vh - 60px); overflow-y: auto; text-align: left; font-size: 13px; background: #fff; border: 1px solid #ccc; border-radius: 8px; padding: 6px 14px 14px; box-shadow: 0 1px 4px rgba(0,0,0,.08); }
+  #rules-panel h2 { font-size: 15px; text-align: left; margin: 10px 0 4px; }
+  #rules-panel .concept-block { padding: 8px 12px; margin: 10px 0; }
+  #rules-panel .concept-block h3 { font-size: 13px; margin: 0 0 4px; }
+  #rules-panel .rep { font-size: 11px; padding: 6px 8px; }
+  #rules-panel p { margin: 4px 0; }
+  #test-counter { font-size: 14px; font-weight: bold; color: #ef6c00; margin-top: 10px; }
+  @media (max-width: 1100px) { #rules-panel { position: static; width: auto; max-width: 480px; margin: 20px auto; } }
 </style>
 </head>
 <body>
@@ -88,14 +96,21 @@
 
   <p>
     There will be <strong>15 trials</strong>. On each trial, the machine has a new hidden rule.
-    You can test the machine as many times as you like &mdash; set the switches however you like,
+    You can test the machine up to <strong>7 times</strong> per trial &mdash; set the switches however you like,
     then press <strong>Test</strong> to see whether N4 turns ON &mdash; before typing out, in your own
-    words, what you think the hidden rule is. There is no right or wrong way to explore, just do
+    words, what you think the hidden rule is. The kinds of rules you may encounter are listed in a panel
+    on the side of the page throughout the task. There is no right or wrong way to explore, just do
     what feels natural to you.
   </p>
 
-  <h2>Kinds of rules you may encounter</h2>
-  <p>Each trial's hidden rule will be one of the following three kinds:</p>
+  <p>The task takes most of the study's time, so please find a moment when you can focus without interruption.</p>
+
+  <button id="beginTaskButton" onclick="beginTask()">Begin task</button>
+</div>
+
+<div id="rules-panel">
+  <h2>Kinds of rules</h2>
+  <p>Each trial's hidden rule is one of these three kinds:</p>
 
   <div class="concept-block">
     <h3>1. Single-feature concept</h3>
@@ -106,9 +121,9 @@
   <div class="concept-block">
     <h3>2. Conjunctive / disjunctive concept</h3>
     <span class="rep">IF [node A] = [state] AND/OR [node B] = [state], THEN N4 turns ON.</span>
-    <p>Example (conjunctive, ON): IF N1 = ON AND N2 = ON, THEN N4 = ON.</p>
-    <p>Example (conjunctive, OFF): IF N1 = OFF AND N2 = OFF, THEN N4 = ON. (Being ON does not help.)</p>
-    <p>Example (disjunctive): IF N1 = ON OR N2 = ON, THEN N4 = ON.</p>
+    <p>Conjunctive, ON: IF N1 = ON AND N2 = ON, THEN N4 = ON.</p>
+    <p>Conjunctive, OFF: IF N1 = OFF AND N2 = OFF, THEN N4 = ON. (Being ON does not help.)</p>
+    <p>Disjunctive: IF N1 = ON OR N2 = ON, THEN N4 = ON.</p>
   </div>
 
   <div class="concept-block">
@@ -116,10 +131,6 @@
     <span class="rep">IF [node A], [node B], and [node C] are all in the SAME state (all ON or all OFF), THEN N4 turns ON.</span>
     <p>Example: IF N1, N2, and N3 all match (all ON or all OFF), THEN N4 = ON.</p>
   </div>
-
-  <p>Keep these three possibilities in mind as you test the machine on each trial.</p>
-
-  <button id="beginTaskButton" onclick="beginTask()">Begin task</button>
 </div>
 
 <div id="task-wrapper">
@@ -157,6 +168,7 @@
   </div>
 
   <button id="testButton" onclick="runTest()">Test</button>
+  <div id="test-counter">Tests used: 0 / 7</div>
 
   <p id="message">Set the switches, then click Test.</p>
 
@@ -168,16 +180,6 @@
   <button id="resetButton" onclick="resetNodes()">Reset switches</button>
 
   <hr>
-  <h2>Could you briefly explain how you start the exam that determines your selection?</h2>
-  <p>
-    For example, it can be a short sentence like: "I just start with a random guess" or "I found both N1 and N2 activate N4."
-  </p>
-  <div id="strategy-input-container">
-    <textarea id="strategyTextInput" rows="3" placeholder="Describe your reasoning here..." oninput="onStrategyTextInput()"></textarea>
-  </div>
-  <p id="answerMessage"></p>
-  <hr>
-
   <h2>What is the hidden rule?</h2>
   <div id="rule-input-container">
     <textarea id="ruleTextInput" rows="3" placeholder="Describe the rule in your own words (e.g., &quot;N4 turns on when N1 and N2 are both ON&quot;)." oninput="onRuleTextInput()"></textarea>

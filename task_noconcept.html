@@ -29,8 +29,8 @@
   #message, #ruleMessage, #answerMessage { font-size: 18px; margin-top: 20px; }
   #history-box { text-align: left; max-width: 420px; margin: 16px auto; padding: 10px 14px; border: 1px solid #ccc; border-radius: 8px; background: #fafafa; font-size: 13px; max-height: 140px; overflow-y: auto; }
   #history-box div { padding: 2px 0; border-bottom: 1px solid #eee; }
-  #strategy-input-container, #rule-input-container { max-width: 420px; margin: 0 auto; text-align: left; }
-  #strategyTextInput, #ruleTextInput { width: 100%; font-size: 15px; padding: 10px; box-sizing: border-box; font-family: Arial, sans-serif; resize: vertical; }
+  #rule-input-container { max-width: 420px; margin: 0 auto; text-align: left; }
+  #ruleTextInput { width: 100%; font-size: 15px; padding: 10px; box-sizing: border-box; font-family: Arial, sans-serif; resize: vertical; }
   button { cursor: pointer; }
   #testButton { margin-top: 20px; padding: 10px 24px; font-size: 16px; background-color: #ef6c00; color: white; border: none; border-radius: 6px; }
   #testButton:disabled { background-color: #aaa; cursor: not-allowed; }
@@ -50,7 +50,7 @@
 <div id="instructions-screen">
   <h1>Task Instructions</h1>
 
-  <p class="notice">Please read the instructions carefully before starting the task.</p>
+  <p class="notice">Please read the instructions very carefully before starting the task.</p>
 
   <p>
     In the next part of the study, you will play the role of an engineer investigating an
@@ -94,23 +94,7 @@
     what feels natural to you.
   </p>
 
-  <h2>Examples of rules you may encounter</h2>
-
-  <div class="concept-block">
-    <h3>1. Single-feature concept</h3>
-    <span class="rep">IF [node] = [state], THEN N4 turns ON.</span>
-    <p>Example: IF N1 = ON, THEN N4 = ON. (N2 and N3 would not matter.)</p>
-  </div>
-
-  <div class="concept-block">
-    <h3>2. Conjunctive / disjunctive concept</h3>
-    <span class="rep">IF [node A] = [state] AND/OR [node B] = [state], THEN N4 turns ON.</span>
-    <p>Example (conjunctive, ON): IF N1 = ON AND N2 = ON, THEN N4 = ON.</p>
-    <p>Example (conjunctive, OFF): IF N1 = OFF AND N2 = OFF, THEN N4 = ON. (Being ON does not help.)</p>
-    <p>Example (disjunctive): IF N1 = ON OR N2 = ON, THEN N4 = ON.</p>
-  </div>
-
-  <p>Use testing to figure out which rule the machine is following on each trial.</p>
+  <p>The task takes most of the study's time, so please find a moment when you can focus without interruption.</p>
 
   <button id="beginTaskButton" onclick="beginTask()">Begin task</button>
 </div>
@@ -161,16 +145,6 @@
   <button id="resetButton" onclick="resetNodes()">Reset switches</button>
 
   <hr>
-  <h2>Could you briefly explain how you start the exam that determines your selection?</h2>
-  <p>
-    For example, it can be a short sentence like: "I just start with a random guess" or "I found both N1 and N2 activate N4."
-  </p>
-  <div id="strategy-input-container">
-    <textarea id="strategyTextInput" rows="3" placeholder="Describe your reasoning here..." oninput="onStrategyTextInput()"></textarea>
-  </div>
-  <p id="answerMessage"></p>
-  <hr>
-
   <h2>What is the hidden rule?</h2>
   <div id="rule-input-container">
     <textarea id="ruleTextInput" rows="3" placeholder="Describe the rule in your own words (e.g., &quot;N4 turns on when N1 and N2 are both ON&quot;)." oninput="onRuleTextInput()"></textarea>
